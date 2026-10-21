@@ -1,0 +1,1383 @@
+TAKNA AI — COMPLETE MASTER PROJECT SPECIFICATION
+
+Native Android APK + Gemini AI + Jarvis Voice Assistant + Coding Studio + Admin Panel + MongoDB + Render + Subscriptions
+
+You are a senior Android developer, full-stack software architect, AI engineer, database engineer, cybersecurity specialist, UI/UX designer, DevOps engineer, and QA engineer.
+
+Your mission is to build the complete TAKNA AI application and its supporting infrastructure.
+
+This is an implementation task, not merely a planning or documentation task. Inspect the available repository, create or update actual project files, implement the features, run available tests, and prepare deployment instructions.
+
+Do not create only a demo, static UI, mockup, or chatbot. Build a maintainable integrated application with real authentication, backend APIs, database persistence, AI integration, administrative controls, subscriptions, retention enforcement, and deployment configuration.
+
+If a required service or credential is unavailable, implement the appropriate integration boundary, explain the missing configuration, and provide exact setup instructions. Never fabricate credentials, test results, deployments, payment confirmations, or APK files.
+
+==================================================
+1. OFFICIAL BRAND AND PROJECT DETAILS
+==================================================
+
+Product name: TAKNA AI
+
+Owner / Registration name: SIBAYAN ENTERPRISE
+
+Company name: TAKNA TECHNOLOGY
+
+Platform: Native Android application
+
+Android language: Kotlin
+
+Android UI: Jetpack Compose
+
+Primary AI brain: Google Gemini
+
+Authentication:
+
+- Google login
+- Email ID and password login
+
+Backend: Node.js + TypeScript + Express
+
+Database: MongoDB
+
+Hosting: Render Free Web Service
+
+Database name: Explicitly configured; prefer "takna_ai" when a separate database is available and authorized.
+
+Payment gateway reference:
+https://www.taknapay.in
+
+Admin Panel: Next.js + TypeScript responsive web application.
+
+Primary assistant languages:
+
+- Hindi
+- English
+- Hinglish command understanding
+
+Brand style:
+
+- Premium futuristic Jarvis-inspired interface
+- Black and dark navy backgrounds
+- Cyan and electric-blue highlights
+- Animated AI orb or waveform
+- Modern typography
+- Smooth animations
+- Professional mobile-first layout
+
+Future objective:
+Build an extensible personal AI ecosystem with voice assistance, coding, website creation, productivity tools, app launching, and subscription-based features.
+
+==================================================
+2. CRITICAL MONGODB SHARED-SERVER ISOLATION
+==================================================
+
+IMPORTANT: The MongoDB server is shared by multiple unrelated projects. TAKNA AI must never damage, modify, rename, or delete another project's data.
+
+Every application-owned collection created or managed by TAKNA AI must start with the exact lowercase prefix:
+
+"ai_"
+
+Examples:
+
+- "ai_users"
+- "ai_user_profiles"
+- "ai_projects"
+- "ai_project_files"
+- "ai_conversations"
+- "ai_messages"
+- "ai_ai_usage"
+- "ai_subscriptions"
+- "ai_subscription_plans"
+- "ai_payment_transactions"
+- "ai_subscription_events"
+- "ai_entitlement_usage"
+- "ai_application_settings"
+- "ai_support_tickets"
+- "ai_audit_logs"
+- "ai_admin_invites"
+
+MongoDB uses collections, not SQL tables.
+
+Mandatory isolation rules:
+
+1. Maintain an explicit allowlist of TAKNA AI collection names.
+2. Validate collection names before creating collections or indexes.
+3. Reject application collection names that do not begin with "ai_".
+4. Never operate on arbitrary collections merely because they share the prefix.
+5. Never call "dropDatabase()" in application startup, migrations, or cleanup scripts.
+6. Never drop or recreate existing collections to initialize the application.
+7. Never run unrestricted database-wide cleanup.
+8. Never alter other projects' indexes, documents, collections, or retention policies.
+9. Never assume that a collection beginning with "ai_" necessarily belongs to TAKNA AI if another project could use the same prefix.
+10. Use explicit database configuration and fail safely if it is missing or invalid.
+11. Scope every migration, TTL index, cleanup job, and database query to the intended database and approved collection.
+12. Prefer a separate "takna_ai" database and dedicated database user if the existing MongoDB deployment permits it.
+13. If a shared database must be used, preserve its existing data and restrict all application operations to the explicitly approved TAKNA AI collections.
+14. Use least-privilege database permissions. Do not use unrestricted server administrator credentials for routine application requests.
+
+All startup scripts must be idempotent and non-destructive.
+
+Before applying a migration to an existing environment, inspect the target database and explain the proposed changes. Never automatically remove unknown collections.
+
+This isolation requirement overrides generic setup instructions elsewhere in this specification.
+
+==================================================
+3. REQUIRED TECHNOLOGY STACK
+==================================================
+
+ANDROID:
+
+- Kotlin
+- Jetpack Compose
+- Material 3
+- MVVM architecture
+- Kotlin Coroutines and Flow
+- Navigation Compose
+- Hilt where appropriate
+- Retrofit and OkHttp
+- Room for appropriate local data
+- DataStore for preferences
+- Firebase Authentication
+- Google Credential Manager
+- Android SpeechRecognizer
+- Android TextToSpeech
+- Android intents for supported application launching
+- A maintained syntax-highlighting code editor
+- Android WebView for secure static website previews
+
+BACKEND:
+
+- Node.js LTS
+- TypeScript
+- Express
+- MongoDB Atlas or the configured MongoDB server
+- Official MongoDB driver or Mongoose
+- Firebase Admin SDK
+- Official Gemini SDK or supported API
+- Zod or equivalent input validation
+- Structured logging with secret redaction
+- Rate limiting
+- Automated tests
+
+ADMIN PANEL:
+
+- Next.js
+- TypeScript
+- Responsive web dashboard
+- Secure authentication
+- Server-enforced role-based access
+- Shared backend APIs
+
+Choose compatible supported dependency versions and document them.
+
+Do not combine incompatible frameworks or put the entire application into one file.
+
+==================================================
+4. LOGO AND BRAND INTEGRATION
+==================================================
+
+Use the provided TAKNA AI logo as the primary branding asset.
+
+Display it in:
+
+- Android launcher icon
+- Android splash screen
+- Login and registration
+- Google login
+- AI assistant home
+- About screen
+- Admin Panel
+- Admin login
+- Subscription screens where appropriate
+
+Create appropriate Android adaptive icons, splash assets, and a simplified small-size emblem.
+
+Preserve the logo's aspect ratio.
+
+If the actual logo file is unavailable, request the file or document the missing asset. Do not invent a file path or claim that the logo has been integrated without verification.
+
+Use the company name TAKNA TECHNOLOGY and registration name SIBAYAN ENTERPRISE in appropriate branding locations.
+
+==================================================
+5. NATIVE ANDROID APP SCREENS
+==================================================
+
+Create:
+
+1. Splash screen
+2. Onboarding
+3. Login
+4. Registration
+5. Email verification
+6. Password reset
+7. Assistant home
+8. Chat interface
+9. Voice settings
+10. Gemini settings
+11. App launcher
+12. YouTube assistant
+13. Coding Studio
+14. File explorer
+15. Code editor
+16. Website preview
+17. Project export
+18. Conversation history
+19. User profile
+20. Subscription plans
+21. Billing history
+22. Privacy settings
+23. General settings
+24. About TAKNA AI
+
+The main home screen must include:
+
+- Branded AI orb or waveform
+- Greeting in the selected language
+- Microphone button
+- Text input
+- Stop-speaking control
+- Quick actions for coding, websites, YouTube and settings
+- Recent projects
+- Recent conversations when available
+- Subscription and usage information
+
+All controls must work or clearly indicate that the relevant integration is awaiting configuration.
+
+==================================================
+6. GEMINI AI BRAIN
+==================================================
+
+Use Google Gemini as the primary AI provider.
+
+Create a provider abstraction with operations such as:
+
+- sendMessage
+- streamResponse
+- generateCode
+- analyzeCode
+- debugCode
+- generateWebsite
+- summarizeContent
+
+Implement Gemini integration using the official supported API and SDK.
+
+Create a Gemini Settings screen containing:
+
+- Connection status
+- Supported model selection
+- Configured model
+- Test connection
+- Response language
+- Streaming preference
+- Usage information where available
+- Error status
+- Configurable request limits
+
+Read the Gemini credential from the backend environment variable:
+
+"GEMINI_API_KEY"
+
+Never expose the API key in:
+
+- Android source code
+- APK resources
+- Client-side configuration
+- Admin Panel browser code
+- Logs
+- API responses
+- Git repositories
+
+Support Hindi, English, and Hinglish commands.
+
+Handle:
+
+- Invalid credentials
+- Rate limits
+- Timeouts
+- Unsupported models
+- Provider errors
+- Network failures
+- Interrupted generation
+
+Use structured tool requests for application actions. Never execute arbitrary free-form AI output as a device command.
+
+==================================================
+7. VOICE ASSISTANT
+==================================================
+
+Implement:
+
+- Speech recognition
+- Spoken AI responses
+- Male and female voices where available
+- Hindi and English support where available
+- Voice preview
+- Adjustable speaking rate and pitch where supported
+- Start and stop listening
+- Stop speaking
+- Interrupt response
+- Text-input fallback
+- Microphone permissions
+- Listening and speaking indicators
+- Voice error handling
+
+Use Android SpeechRecognizer and TextToSpeech where appropriate.
+
+Inspect the voices and languages available on the device rather than promising unsupported voices.
+
+Wake-word activation such as "Hey Jarvis" may be implemented as a separately configured capability. Explain platform, battery, microphone, and background-execution limitations. Do not silently record audio or claim unrestricted always-on listening.
+
+==================================================
+8. ANDROID APPLICATION CONTROL
+==================================================
+
+Support natural-language commands:
+
+- Open YouTube
+- Open Chrome
+- Open my browser
+- Open calculator
+- Open coding workspace
+
+Create a command router that:
+
+1. Identifies the intent.
+2. Validates it against an allowlist.
+3. Checks application availability.
+4. Requests necessary permissions.
+5. Uses supported Android intents.
+6. Reports success or failure.
+
+Do not bypass Android security restrictions.
+
+Do not claim unrestricted access to other applications' screens or the entire device.
+
+Require confirmation for sensitive actions.
+
+==================================================
+9. YOUTUBE ASSISTANT
+==================================================
+
+Support commands such as:
+
+- Search Hindi songs
+- Search a named artist
+- Search relaxing music
+- Search coding tutorials
+- Open YouTube
+- Search web development videos
+
+Use legitimate YouTube URLs or authorized APIs.
+
+Open results in YouTube or a supported browser.
+
+Do not scrape private APIs or promise unrestricted background playback.
+
+==================================================
+10. FULL WEB DEVELOPMENT STUDIO
+==================================================
+
+Build a real coding workspace.
+
+PROJECT MANAGEMENT:
+
+- Create projects
+- Rename projects
+- Delete projects with confirmation
+- Open recent projects
+- Select starter templates
+- Display project metadata
+
+FILE EXPLORER:
+
+- "index.html"
+- "styles.css"
+- "app.js"
+- "package.json"
+- "README.md"
+- Additional project files
+
+CODE EDITOR:
+
+- Syntax highlighting
+- File tabs
+- Line numbers
+- Search
+- Copy and paste
+- Undo where supported
+- Save and dirty-state indicators
+- Code explanations
+- Code generation
+- Error display
+
+GEMINI CODING ASSISTANT:
+
+- Generate websites
+- Write HTML, CSS and JavaScript
+- Generate React and TypeScript code
+- Debug code
+- Explain errors in Hindi or English
+- Help with APIs and authentication
+- Generate dashboards
+- Improve responsive design
+- Organize project files
+
+SAFE CODE CHANGES:
+
+1. Identify affected files.
+2. Show proposed changes or a diff.
+3. Request approval.
+4. Validate all paths.
+5. Apply approved changes.
+6. Provide undo or restore functionality where practical.
+
+LIVE PREVIEW:
+
+- Use Android WebView.
+- Support static HTML, CSS and JavaScript.
+- Resolve local assets correctly.
+- Refresh after edits.
+- Show preview errors.
+- Restrict dangerous WebView capabilities.
+- Do not expose unrestricted filesystem access.
+
+EXPORT:
+
+- Export individual files.
+- Export a complete project ZIP.
+- Preserve folder structure.
+- Use Android Storage Access Framework.
+- Support project sharing.
+
+Do not execute untrusted project code on the production API server.
+
+Advanced frameworks that require build tools must use a separately secured build service or be clearly marked as source-generation-only until such a service is configured.
+
+==================================================
+11. GOOGLE LOGIN AND EMAIL/PASSWORD LOGIN
+==================================================
+
+Use Firebase Authentication unless an existing configured authentication provider is already established.
+
+Implement:
+
+- Google login using supported Credential Manager and Google Identity APIs
+- Email/password registration
+- Email/password login
+- Email verification
+- Password reset
+- Resend verification
+- Logout
+- Session restoration
+- Session expiration
+- Supported account linking
+
+Use polished native Jetpack Compose screens.
+
+After authentication, send the Firebase ID token to the backend using:
+
+"Authorization: Bearer <FIREBASE_ID_TOKEN>"
+
+Verify tokens server-side with Firebase Admin SDK.
+
+Use the verified UID as the authoritative identity.
+
+Never store raw passwords in MongoDB.
+
+Never grant admin privileges during public registration.
+
+Do not merge accounts automatically based only on an unverified matching email address.
+
+Document Firebase project configuration, OAuth client IDs, signing fingerprints and setup requirements. Do not fabricate credentials.
+
+==================================================
+12. BACKEND ARCHITECTURE
+==================================================
+
+Build a Node.js + TypeScript + Express backend.
+
+Organize it into:
+
+- Configuration
+- Middleware
+- Routes
+- Controllers
+- Services
+- Repositories
+- Models
+- Validation
+- Database initialization
+- Migrations
+- Jobs
+- Tests
+
+Implement:
+
+- Authentication middleware
+- Authorization middleware
+- Input validation
+- Rate limiting
+- Safe error handling
+- Structured logging
+- MongoDB connection management
+- Graceful shutdown
+- Request size limits
+- HTTPS-compatible deployment
+- CORS configuration for the Admin Panel
+
+The backend must be the authoritative source for user identity, subscription status, entitlements, permissions and chat expiration.
+
+==================================================
+13. MONGODB SCHEMA AND COLLECTIONS
+==================================================
+
+Use the explicitly configured database.
+
+Preferred database name if separately available:
+
+"takna_ai"
+
+All application collections must use the exact prefix "ai_".
+
+Create or manage only the following approved collections:
+
+1. "ai_users"
+2. "ai_user_profiles"
+3. "ai_projects"
+4. "ai_project_files"
+5. "ai_conversations"
+6. "ai_messages"
+7. "ai_ai_usage"
+8. "ai_subscriptions"
+9. "ai_subscription_plans"
+10. "ai_payment_transactions"
+11. "ai_subscription_events"
+12. "ai_entitlement_usage"
+13. "ai_application_settings"
+14. "ai_support_tickets"
+15. "ai_audit_logs"
+16. "ai_admin_invites"
+
+Do not create collections outside this allowlist without explicit review.
+
+USERS:
+
+- Firebase UID
+- Email
+- Display name
+- Profile image URL where available
+- Email verification status
+- Account status
+- Role
+- Created and updated timestamps
+- Last login
+
+PROJECTS:
+
+- Owner ID
+- Name
+- Type
+- Metadata
+- Created and updated timestamps
+
+PROJECT FILES:
+
+- Owner ID
+- Project ID
+- Relative file path
+- Content
+- Language
+- Version
+- Updated timestamp
+
+CONVERSATIONS AND MESSAGES:
+
+- Owner ID
+- Conversation ID
+- Role
+- Content
+- Created timestamp
+- Expiration timestamp
+
+SUBSCRIPTIONS:
+
+- Owner ID
+- Plan ID
+- Status
+- Provider references
+- Billing period
+- Expiration
+- Cancellation information
+- Timestamps
+
+PAYMENT TRANSACTIONS:
+
+- Owner ID
+- Subscription ID
+- Provider
+- Transaction reference
+- Amount
+- Currency
+- Status
+- Timestamps
+
+Use schema validation, indexes, unique constraints and safe migrations.
+
+Never store passwords, API secrets, payment credentials or authentication tokens in ordinary database documents.
+
+==================================================
+14. MANDATORY SHARED-DATABASE SAFETY
+==================================================
+
+This requirement is critical.
+
+The MongoDB server is shared with multiple projects.
+
+Every database operation must explicitly target the configured TAKNA AI database and approved collections.
+
+Never:
+
+- Drop the database
+- Drop unknown collections
+- Delete collections by wildcard
+- Rename other projects' collections
+- Modify other projects' indexes
+- Run database-wide destructive cleanup
+- Apply TAKNA AI migrations to arbitrary collections
+
+Never invoke "dropDatabase()" in normal application code, startup scripts, migrations or cleanup jobs.
+
+At startup:
+
+1. Validate the MongoDB URI.
+2. Validate the configured database name.
+3. Validate the collection allowlist.
+4. Create only missing approved collections when appropriate.
+5. Initialize only the required indexes.
+6. Preserve all existing records.
+7. Fail safely if configuration is invalid.
+
+Maintain an explicit list of approved collections.
+
+A collection prefix alone is not sufficient authorization to modify a collection.
+
+Prefer a dedicated database user with the minimum permissions needed.
+
+If the deployment cannot enforce collection-level permissions, document the limitations and use the strongest supported database-level restrictions.
+
+==================================================
+15. AUTOMATIC SEVEN-DAY CHAT DELETION
+==================================================
+
+Mandatory rule:
+
+Every stored chat message must expire seven days after its individual creation timestamp.
+
+This rule applies equally to Free and Premium users.
+
+Use:
+
+- "ai_messages"
+- "ai_conversations"
+
+Each message must contain:
+
+- "_id"
+- "ownerId"
+- "conversationId"
+- "role"
+- "content"
+- "createdAt"
+- "expiresAt"
+
+Calculate:
+
+"expiresAt = createdAt + 7 days"
+
+Every new message gets its own expiration timestamp.
+
+Do not reset existing messages' expiration when a new message is added.
+
+Each conversation record must also have an explicit seven-day expiration policy.
+
+Create MongoDB TTL indexes on "expiresAt" with "expireAfterSeconds: 0" for the approved collections.
+
+Use idempotent index initialization.
+
+API-level retention enforcement is mandatory because MongoDB TTL deletion is asynchronous.
+
+Requirements:
+
+- Exclude expired messages from history APIs.
+- Exclude expired conversations from lists.
+- Reject access to expired history.
+- Verify resource ownership.
+- Clear expired cached history.
+- Prevent exports and analytics from retaining expired message content.
+- Provide Delete Chat Now.
+- Confirm backend deletion before reporting success.
+
+Add retention monitoring and safe cleanup verification.
+
+Do not rely solely on Render staying awake.
+
+Do not preserve full conversation content in permanent logs, audit records, support tickets or analytics.
+
+The Admin Panel must display the seven-day policy, TTL index status and cleanup verification.
+
+Ordinary administrators must not be able to disable the mandatory retention rule.
+
+Document provider-side and backup retention separately. Do not claim immediate erasure from every backup unless it is actually guaranteed.
+
+Test expiry timestamps, TTL indexes, API access restrictions, early deletion and cleanup retries.
+
+==================================================
+16. COMPLETE ADMIN PANEL
+==================================================
+
+Build a separate responsive Next.js + TypeScript Admin Panel.
+
+Use the same backend and database as the Android application.
+
+ADMIN ROLES:
+
+SUPER_ADMIN:
+
+- Full authorized administration
+- Administrator management
+- Security settings
+- Application configuration
+- User and subscription management
+
+ADMIN:
+
+- Authorized user management
+- Analytics
+- Permitted subscription and configuration changes
+
+SUPPORT:
+
+- Limited account and support access
+- No unrestricted secrets or financial operations
+
+Enforce all permissions server-side.
+
+Never grant admin privileges through public registration, client-supplied roles or email domain alone.
+
+Provision the initial super-admin securely.
+
+ADMIN DASHBOARD:
+
+- Total users
+- New registrations
+- Active users
+- Suspended users
+- AI requests
+- Usage metrics where available
+- API errors and latency
+- Projects and files
+- Subscription counts
+- Verified payment summaries
+- Database status
+- Server health
+- Chat retention status
+
+USER MANAGEMENT:
+
+- Search and pagination
+- Profile and verification status
+- Login provider
+- Account suspension and reinstatement
+- Session revocation where supported
+- Subscription information
+- Controlled account deletion
+
+GEMINI CONTROL:
+
+- Model configuration
+- Provider status
+- Usage monitoring
+- Rate limits
+- Feature controls
+- Error monitoring
+- Configuration audit trail
+
+DATABASE MONITORING:
+
+- Database connectivity
+- Approved collection counts
+- Index status
+- Retention status
+- Cleanup results
+- Database errors
+
+CODING PROJECT MANAGEMENT:
+
+- Project counts
+- File metadata
+- Storage metrics
+- Failed operations
+
+Do not expose private source code by default.
+
+SUBSCRIPTION MANAGEMENT:
+
+- Create and edit plans
+- Configure pricing
+- Configure quotas
+- View subscribers
+- View subscription status
+- Review expiry and payment references
+- Manage authorized entitlements
+
+PAYMENT MANAGEMENT:
+
+- Pending transactions
+- Verified successful transactions
+- Failed transactions
+- Amount and currency
+- Provider references
+- Refund status where supported
+- Reconciliation
+
+Never count pending transactions as confirmed revenue.
+
+APPLICATION SETTINGS:
+
+- Maintenance mode
+- Feature flags
+- Supported languages
+- Voice options
+- Usage limits
+- Public announcements
+- Minimum supported app version
+- Support information
+
+SUPPORT:
+
+- Tickets
+- Assignment
+- Status updates
+- Restricted internal notes
+
+SECURITY:
+
+- Admin roles
+- Login attempts
+- Session revocation
+- Audit logs
+- Sensitive action confirmations
+- Security monitoring
+
+All production analytics must use real backend data.
+
+Never expose secrets, authentication tokens, passwords or unnecessary private conversation contents.
+
+==================================================
+17. SUBSCRIPTION SYSTEM
+==================================================
+
+Implement backend-enforced Free and Premium subscriptions.
+
+FREE PLAN:
+
+- Zero price
+- Basic AI chat
+- Configurable daily and monthly limits
+- Basic coding features
+- Configurable project limits
+- Seven-day chat retention
+
+PREMIUM MONTHLY:
+
+- Configurable monthly price
+- Higher AI usage limits
+- Expanded coding quotas
+- Increased project and storage limits
+- Premium entitlements that are actually implemented
+- Seven-day chat retention
+
+PREMIUM YEARLY:
+
+- Configurable yearly price
+- Configurable entitlements
+- Annual billing period
+- Seven-day chat retention
+
+Do not invent selling prices.
+
+Create:
+
+- "ai_subscription_plans"
+- "ai_subscriptions"
+- "ai_payment_transactions"
+- "ai_subscription_events"
+- "ai_entitlement_usage"
+
+Support:
+
+- Plan selection
+- Checkout initiation
+- Server-side payment verification
+- Premium activation
+- Subscription status
+- Cancellation
+- Expiration
+- Renewal events where supported
+- Billing history
+- Subscription restoration after reinstall or login on another device
+- Reversion to Free entitlements after expiry
+
+The backend must determine access from verified subscription records.
+
+Never rely on locally cached Premium status.
+
+Implement a centralized entitlement service with configurable keys such as:
+
+- "ai.chat"
+- "ai.code_generation"
+- "ai.advanced_models"
+- "projects.create"
+- "projects.max_count"
+- "projects.max_file_size"
+- "projects.export_zip"
+- "ai.daily_requests"
+- "ai.monthly_requests"
+- "ai.max_output_size"
+
+Enforce quotas on the backend using concurrency-safe usage updates.
+
+Do not silently charge users for extra usage.
+
+==================================================
+18. TAKNAPAY INTEGRATION
+==================================================
+
+Payment gateway reference:
+
+"https://www.taknapay.in"
+
+Create a modular payment provider interface.
+
+Do not invent undocumented API endpoints, credentials, webhook formats or recurring billing capabilities.
+
+Before enabling live payments, obtain and verify the provider's official API documentation and merchant configuration.
+
+Implement only supported operations.
+
+Verify payment status server-side.
+
+Validate webhook signatures where supported.
+
+Make webhook processing idempotent.
+
+Never activate Premium from an unverified Android client callback.
+
+If recurring payments are not supported, use manual renewal instead of pretending automatic renewal is available.
+
+Keep live payments disabled until the integration is configured and tested.
+
+Never store card numbers, CVVs or payment passwords.
+
+==================================================
+19. RENDER FREE SERVER DEPLOYMENT
+==================================================
+
+Create a Render-compatible Node.js web service.
+
+The backend must:
+
+- Listen on "process.env.PORT || 10000"
+- Bind to "0.0.0.0"
+- Expose "GET /health"
+- Expose "GET /ready"
+- Handle graceful shutdown
+- Handle database failures
+- Use reasonable timeouts
+- Redact secrets from logs
+- Recover from transient errors
+
+Create:
+
+- "package.json"
+- "tsconfig.json"
+- "render.yaml" where appropriate
+- ".env.example"
+- ".gitignore"
+- "README.md"
+- Backend source
+- Tests
+- Database initialization
+- Migration scripts
+- API documentation
+
+Use compatible build and start commands, for example:
+
+Build:
+"npm ci && npm run build"
+
+Start:
+"npm start"
+
+Configure environment variables through Render's dashboard.
+
+Do not invent a Render hostname.
+
+Render Free can sleep after inactivity. Handle cold starts and transient failures.
+
+Do not send artificial keep-alive traffic to bypass free-tier sleep.
+
+MongoDB TTL expiration must remain independent of Render staying awake.
+
+Do not use Render's temporary filesystem for permanent user data.
+
+==================================================
+20. ENVIRONMENT VARIABLES
+==================================================
+
+Provide an ".env.example" containing placeholders only:
+
+"NODE_ENV=development"
+
+"PORT=10000"
+
+"MONGODB_URI="
+
+"MONGODB_DB_NAME="
+
+"GEMINI_API_KEY="
+
+"FIREBASE_PROJECT_ID="
+
+"FIREBASE_CLIENT_EMAIL="
+
+"FIREBASE_PRIVATE_KEY="
+
+"CORS_ORIGINS="
+
+"ADMIN_BOOTSTRAP_SECRET="
+
+Add payment environment variables only after the real provider specification is known.
+
+Document every variable.
+
+Never commit real secrets.
+
+Validate configuration at startup without printing secret values.
+
+Use an explicitly configured database name. Prefer a dedicated "takna_ai" database when available and authorized. If the user chooses an existing shared database, preserve it and use only approved TAKNA AI collections.
+
+==================================================
+21. MONGODB SETUP GUIDE
+==================================================
+
+Document how to:
+
+1. Create or select the MongoDB Atlas project.
+2. Create or select the cluster.
+3. Create a dedicated database user.
+4. Configure network access safely.
+5. Obtain the connection URI.
+6. Encode special characters correctly.
+7. Configure "MONGODB_URI" in Render.
+8. Configure the intended database name.
+9. Deploy the backend.
+10. Verify connectivity and indexes.
+
+Do not expose database credentials.
+
+Prefer the narrowest supported database permissions. Do not recommend unrestricted network access as the default.
+
+==================================================
+22. REQUIRED API ROUTES
+==================================================
+
+PUBLIC:
+
+- "GET /health"
+- "GET /ready"
+- "GET /api/v1/subscriptions/plans"
+
+AUTHENTICATED USER:
+
+- "GET /api/v1/me"
+- "PATCH /api/v1/me"
+- "GET /api/v1/projects"
+- "POST /api/v1/projects"
+- "GET /api/v1/projects/:projectId"
+- "PATCH /api/v1/projects/:projectId"
+- "DELETE /api/v1/projects/:projectId"
+- "GET /api/v1/projects/:projectId/files"
+- "PUT /api/v1/projects/:projectId/files"
+- "GET /api/v1/conversations"
+- "POST /api/v1/conversations"
+- "GET /api/v1/conversations/:conversationId/messages"
+- "DELETE /api/v1/conversations/:conversationId"
+- "POST /api/v1/ai/chat"
+- "POST /api/v1/ai/code"
+- "GET /api/v1/usage"
+- "GET /api/v1/subscriptions/me"
+- "POST /api/v1/subscriptions/checkout"
+- "POST /api/v1/subscriptions/cancel"
+- "GET /api/v1/subscriptions/history"
+- "GET /api/v1/entitlements/me"
+
+ADMIN:
+
+- "GET /api/v1/admin/dashboard"
+- "GET /api/v1/admin/users"
+- "PATCH /api/v1/admin/users/:userId/status"
+- "GET /api/v1/admin/usage"
+- "GET /api/v1/admin/plans"
+- "POST /api/v1/admin/plans"
+- "PATCH /api/v1/admin/plans/:planId"
+- "GET /api/v1/admin/transactions"
+- "GET /api/v1/admin/subscriptions"
+- "GET /api/v1/admin/settings"
+- "PATCH /api/v1/admin/settings"
+- "GET /api/v1/admin/audit-logs"
+- "GET /api/v1/admin/retention"
+
+Add payment webhook routes only after obtaining the real provider specification.
+
+All routes must validate authentication, permissions, ownership, IDs, payload sizes and input schemas.
+
+Never trust a client-supplied owner ID.
+
+==================================================
+23. SECURITY REQUIREMENTS
+==================================================
+
+Implement:
+
+- HTTPS in production
+- Firebase ID token verification
+- Server-side authorization
+- Rate limiting
+- Request validation
+- Restricted CORS
+- Secure HTTP headers
+- Resource ownership checks
+- Protection against IDOR
+- Safe MongoDB queries
+- Safe file path validation
+- Session revocation where supported
+- Audit logging
+- Secret redaction
+- Safe error responses
+- User-controlled history deletion
+- Clear microphone and privacy disclosures
+
+Never log passwords, API keys, tokens, payment secrets or full chat content.
+
+Do not claim end-to-end encryption unless the architecture genuinely implements it.
+
+==================================================
+24. TESTING REQUIREMENTS
+==================================================
+
+Create automated tests for:
+
+- Google authentication
+- Email/password authentication
+- Invalid and expired tokens
+- Account linking
+- Database connection
+- Approved collection initialization
+- Database isolation
+- No destructive startup operations
+- TTL index initialization
+- Seven-day expiration
+- Expired history access
+- Early chat deletion
+- Project ownership
+- File path validation
+- Gemini failures
+- Rate limiting
+- Subscription activation
+- Failed payment
+- Duplicate payment events
+- Subscription expiry
+- Quota enforcement
+- Admin role enforcement
+- Database outages
+- Secret redaction
+- Android navigation
+- Coding workspace save and export
+
+Use a separate test database.
+
+Never run destructive tests against production data.
+
+Run actual available build, lint, type-check and test commands.
+
+Report actual results. Never invent a successful build or test.
+
+==================================================
+25. PROJECT STRUCTURE
+==================================================
+
+Use a maintainable structure similar to:
+
+"takna-ai/"
+
+- "android-app/"
+  - "app/"
+  - "core/"
+  - "feature/auth/"
+  - "feature/assistant/"
+  - "feature/voice/"
+  - "feature/coding/"
+  - "feature/projects/"
+  - "feature/subscription/"
+  - "feature/settings/"
+
+- "backend/"
+  - "src/config/"
+  - "src/middleware/"
+  - "src/models/"
+  - "src/repositories/"
+  - "src/services/"
+  - "src/routes/"
+  - "src/controllers/"
+  - "src/validators/"
+  - "src/database/"
+  - "src/jobs/"
+  - "src/tests/"
+
+- "admin-panel/"
+  - "src/app/"
+  - "src/components/"
+  - "src/lib/"
+
+- "docs/"
+
+- ".gitignore"
+
+- "README.md"
+
+Adapt this layout to the existing repository without unnecessarily duplicating working code.
+
+==================================================
+26. IMPLEMENTATION WORKFLOW
+==================================================
+
+PHASE 1:
+Inspect the repository, document existing components, and create an implementation checklist.
+
+PHASE 2:
+Build the native Android foundation, branding, navigation and main UI.
+
+PHASE 3:
+Implement Google and email/password authentication.
+
+PHASE 4:
+Implement the Express backend, secure MongoDB connection and approved "ai_" collections.
+
+PHASE 5:
+Integrate Gemini securely.
+
+PHASE 6:
+Implement voice assistance, supported Android actions and YouTube search.
+
+PHASE 7:
+Implement the full coding workspace, editor, preview and ZIP export.
+
+PHASE 8:
+Build the Admin Panel and role-based authorization.
+
+PHASE 9:
+Implement seven-day chat expiration, TTL indexes and retention monitoring.
+
+PHASE 10:
+Implement subscription plans, quotas, entitlements and billing history.
+
+PHASE 11:
+Integrate TAKNAPAY only when official documentation and credentials are available.
+
+PHASE 12:
+Run security checks, automated tests and build verification.
+
+PHASE 13:
+Prepare Render deployment configuration and database setup documentation.
+
+PHASE 14:
+Build the Android APK if the environment supports Android build tools. Otherwise provide exact local build instructions.
+
+After each phase:
+
+- Create real files.
+- Preserve the existing architecture.
+- Run available tests.
+- Record what is complete.
+- Record what still requires configuration.
+- Continue to the next phase.
+
+Do not stop after generating a plan. Start actual implementation.
+
+If the task exceeds the current response or execution limits, finish the current file or stage, report the precise remaining work, and continue from that point without replacing implementation with pseudocode.
+
+==================================================
+27. FINAL DELIVERABLES
+==================================================
+
+Deliver:
+
+1. Native Android project.
+2. TAKNA AI logo integration.
+3. Google login.
+4. Email/password login.
+5. Gemini AI backend integration.
+6. Hindi and English voice assistant.
+7. Supported Android app launching.
+8. YouTube assistant.
+9. Full basic web development workspace.
+10. Code editor and preview.
+11. Project saving and ZIP export.
+12. Secure Node.js backend.
+13. MongoDB integration.
+14. Approved "ai_" collection list.
+15. Shared-server database isolation.
+16. Seven-day automatic chat retention.
+17. Complete Admin Panel.
+18. Role-based authorization.
+19. Free and Premium subscriptions.
+20. Usage limits and entitlements.
+21. TAKNAPAY integration boundary.
+22. Render deployment configuration.
+23. ".env.example".
+24. Automated tests.
+25. README and setup documentation.
+26. APK build instructions.
+27. Release signing instructions.
+
+Never claim that an APK exists unless it has actually been built.
+
+Never claim that a deployment succeeded unless it was actually performed and verified.
+
+Never claim that a payment integration is live unless it has been configured and tested.
+
+Never claim that chat records have been deleted unless the database confirms deletion.
+
+Never modify another project's MongoDB data.
+
+Never expose production secrets.
+
+FINAL SUCCESS CRITERION:
+
+Build TAKNA AI as a coordinated, secure and maintainable system consisting of:
+
+- A native Android assistant.
+- A secure backend on Render.
+- An explicitly configured MongoDB database.
+- Application collections beginning with "ai_".
+- Google Gemini as the primary AI brain.
+- Google and email/password authentication.
+- A full coding workspace.
+- A complete authorized Admin Panel.
+- Free and Premium subscriptions.
+- Verified payment processing when configured.
+- Automatic seven-day chat retention.
+- Tested code and honest deployment documentation.
+
+Begin by inspecting the existing project, then implement the actual files in manageable stages until the available work is complete.
