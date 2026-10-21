@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05070f">
+<title>TAKNA Assist</title>
+<style>
+:root{--bg:#05070f;--card:#0d1226;--text:#e8f1ff;--mut:#7f8db0;--c:#22d3ee;--c2:#6d5efc;--bd:#1b2547;--red:#ef4444}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
+body{background:radial-gradient(ellipse at 50% 38%,#0b1330 0%,var(--bg) 62%);color:var(--text);font:16px/1.45 system-ui,sans-serif;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);overflow:hidden}
+[hidden]{display:none!important}
+button{font:inherit;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--c2),#8f7bff);border:0;border-radius:12px;padding:10px 14px}
+button.g{background:transparent;color:var(--text);border:1px solid var(--bd)}
+input,select{font:inherit;width:100%;background:#080c1b;color:var(--text);border:1px solid var(--bd);border-radius:12px;padding:11px 12px;margin:5px 0 10px}
+label{font-size:12px;font-weight:600;color:var(--mut);text-transform:uppercase}.m{color:var(--mut);font-size:13px}
+#auth{margin:auto;width:min(380px,92vw);background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:22px}
+.logo{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#a5f3fc,var(--c) 45%,var(--c2));box-shadow:0 0 26px var(--c);margin-bottom:10px}
+#main{flex:1;display:flex;flex-direction:column;min-height:0}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px}
+header b{flex:1;letter-spacing:3px;font-size:13px;text-transform:uppercase;color:var(--c)}
+.pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--c);color:var(--c)}
+header button{padding:6px 12px}
+.bn{margin:0 16px;padding:8px 12px;border:1px solid var(--bd);border-radius:12px;font-size:13px;color:var(--mut);text-align:center}
+#stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 20px;min-height:0}
+.orb{position:relative;width:min(68vw,270px);aspect-ratio:1;display:grid;place-items:center;border:0;background:none;padding:0;border-radius:50%;cursor:pointer}
+.ring{position:absolute;border-radius:50%;border:2px solid transparent;border-top-color:var(--c);border-bottom-color:var(--c2);opacity:.85}
+.r1{inset:0;animation:spin 9s linear infinite}.r2{inset:11%;border-style:dashed;animation:spin 6s linear infinite reverse}.r3{inset:22%;animation:spin 3.5s linear infinite}
+.core{width:40%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#cffafe,var(--c) 42%,var(--c2));box-shadow:0 0 40px #22d3ee88,0 0 90px #6d5efc55}
+.listen .core{animation:pulse .9s ease-in-out infinite;box-shadow:0 0 60px var(--c),0 0 130px #22d3ee99}
+.think .r1{animation-duration:1.4s}.think .r2{animation-duration:1s}.think .r3{animation-duration:.7s}
+.speak .core{animation:talk .4s ease-in-out infinite alternate}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:scale(1.18)}}@keyframes talk{to{transform:scale(1.22)}}
+.eq{display:flex;gap:5px;height:26px;align-items:center}.eq i{width:4px;height:6px;border-radius:2px;background:var(--c);opacity:.35}
+.listen .eq i,.speak .eq i{opacity:1;animation:bar .6s ease-in-out infinite alternate}
+.eq i:nth-child(2n){animation-delay:.15s}.eq i:nth-child(3n){animation-delay:.3s}.eq i:nth-child(5n){animation-delay:.08s}
+@keyframes bar{to{height:24px}}
+#stt{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--c);min-height:20px;text-align:center}
+#cap{max-width:92%;text-align:center;min-height:70px;max-height:20vh;overflow-y:auto}
+#you{color:var(--mut);font-size:14px;margin-bottom:6px}#bot{font-size:16px}
+.nocap #cap{visibility:hidden}
+footer{padding:8px 16px 14px;display:flex;flex-direction:column;gap:8px;align-items:center}
+#ad{width:100%;padding:8px 12px;border:1px dashed var(--bd);border-radius:12px;font-size:13px;text-align:center}#ad a{color:var(--c);text-decoration:none;font-weight:600}
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;z-index:5}
+#panel{background:var(--card);width:100%;max-height:85vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:18px 18px 28px;border-top:1px solid var(--bd)}
+.plan{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--bd);border-radius:14px;padding:12px;margin:8px 0}
+.line{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
+</style></head><body>
+<div id="auth" hidden><div class="logo"></div><h2 id="an" style="margin:0 0 4px">TAKNA Assist</h2><p class="m">Sign in to continue</p>
+<label>Name (new accounts)</label><input id="nm"><label>Email</label><input id="em" type="email" autocomplete="username">
+<label>Password</label><input id="pw" type="password" autocomplete="current-password">
+<button onclick="doAuth('login')" style="width:100%">Login</button><button class="g" onclick="doAuth('register')" style="width:100%;margin-top:8px">Create account</button>
+<div id="gbtn" style="margin-top:12px"></div><p class="m" id="aerr" style="color:var(--red)"></p></div>
+<div id="main" hidden>
+<header><b id="hn">TAKNA Assist</b><span class="pill" id="pp"></span><button class="g" onclick="menu()" aria-label="Menu">☰</button></header>
+<div class="bn" id="bn" hidden></div>
+<div id="stage">
+ <button class="orb idle" id="orb" onclick="orbTap()" aria-label="Talk to TAKNA"><span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="core"></span></button>
+ <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+ <div id="stt"></div>
+ <div id="cap"><div id="you"></div><div id="bot"></div></div>
+</div>
+<footer><button class="g" id="cv" onclick="toggleConv()">Always listening: off</button><div id="ad" hidden></div><div class="m" id="left"></div></footer></div>
+<div id="sheet" hidden onclick="if(event.target===this)closeSheet()"><div id="panel"></div></div>
+<script>
+const $=id=>document.getElementById(id),NB=window.AndroidBridge;
+let T=localStorage.getItem('tk'),ME=null,CFG={},msgs=[],busy=false,until=0,ST='idle',rec=null,tm,awake=false,t0=0,fails=0;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(p,m='GET',b){const r=await fetch('/api'+p,{method:m,headers:{'content-type':'application/json',...(T?{authorization:'Bearer '+T}:{})},body:b?JSON.stringify(b):undefined});
+ const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.error||r.status);e.data=j;e.status=r.status;throw e}return j}
+function closeSheet(){$('sheet').hidden=true}
+function panel(h){$('panel').innerHTML=h;$('sheet').hidden=false}
+const lang=()=>localStorage.getItem('lang')||'en-US';
+function setState(s){ST=s;$('orb').className='orb '+s;$('eq').parentNode.className=(s==='listen'||s==='speak'?s:'')+(localStorage.getItem('cap')!=='1'?' nocap':'');
+ document.body.classList.toggle('nocap',localStorage.getItem('cap')!=='1');
+ $('stt').textContent={idle:'Tap the orb and speak',listen:'Listening…',think:'Thinking…',speak:'Speaking…'}[s]}
+function cap(y,b){$('you').textContent=y;$('bot').textContent=b}
+async function boot(){
+ try{CFG=await api('/config')}catch(e){}
+ $('an').textContent=$('hn').textContent=CFG.name||'TAKNA Assist';
+ if(CFG.googleClientId&&!NB){const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=()=>{google.accounts.id.initialize({client_id:CFG.googleClientId,callback:r=>finish(api('/auth/google','POST',{credential:r.credential}))});google.accounts.id.renderButton($('gbtn'),{theme:'filled_black',width:300})};document.head.appendChild(s)}
+ if(T){try{await load();return}catch(e){T=null;localStorage.removeItem('tk')}}
+ $('auth').hidden=false}
+async function finish(p){try{const j=await p;T=j.token;localStorage.setItem('tk',T);$('auth').hidden=true;await load()}catch(e){$('aerr').textContent=e.message}}
+function doAuth(m){finish(api('/auth/'+m,'POST',{email:$('em').value,password:$('pw').value,name:$('nm').value}))}
+function logout(){localStorage.removeItem('tk');location.reload()}
+async function load(){
+ ME=await api('/me');$('main').hidden=false;$('auth').hidden=true;head();setState('idle');convLabel();
+ if(CFG.maintenance)note('Server is under maintenance.');else if(CFG.announcement)note(CFG.announcement);
+ ads();checkUpdate();cap('','Hi, I’m ready. Tap the orb and talk to me.');
+ try{const h=await api('/history');if(h.saveHistory&&h.messages.length)msgs=h.messages.slice(-8).map(m=>({role:m.role,content:m.content}))}catch(e){}}
+function head(){$('pp').textContent=ME.user.plan==='free'?'FREE':'PRO';$('left').textContent=(ME.limits.daily-ME.usedToday)+' AI requests left today'}
+function note(t){$('bn').textContent=t;$('bn').hidden=false}
+function ads(){const l=(CFG.ads||[]);if(ME.user.plan!=='free'||!l.length){$('ad').hidden=true;return}let i=0;const show=()=>{const a=l[i++%l.length];$('ad').innerHTML=`<small class="m">Ad</small> <a href="${esc(a.link)}" target="_blank">${esc(a.title)}</a> ${esc(a.text)}`;$('ad').hidden=false};show();setInterval(show,9000)}
+async function checkUpdate(){if(!NB)return;try{const u=await api('/update?v='+encodeURIComponent(NB.version()));if(!u.updateAvailable)return;
+ panel(`<h3>Update available (${esc(u.latest)})</h3><p>${esc(u.changelog||'')}</p><a href="${esc(u.url)}" target="_blank"><button style="width:100%">Download update</button></a>${u.force?'':'<button class="g" style="width:100%;margin-top:8px" onclick="closeSheet()">Later</button>'}`);
+ if(u.force)$('sheet').onclick=null}catch(e){}}
+function orbTap(){
+ if(ST==='listen'){if(NB)NB.stop();else if(rec)rec.stop();return}
+ if(ST==='speak'){try{speechSynthesis.cancel()}catch(e){}setState('idle');return}
+ if(ST==='think')return;
+ const s=Math.ceil((until-Date.now())/1000);if(s>0){$('stt').textContent='Cool down: '+s+'s';return}
+ listen()}
+function listen(){setState('listen');t0=Date.now();
+ if(NB){NB.listen(lang());return}
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){cap('','Voice input isn’t supported in this browser. Open the app instead.');setState('idle');return}
+ rec=new SR();rec.lang=lang();let f='';rec.interimResults=true;rec.onresult=e=>{f=[...e.results].map(r=>r[0].transcript).join('');cap(f,'')};
+ rec.onerror=()=>{};rec.onend=()=>{rec=null;if(f)heard(f);else empty()};rec.start()}
+window.onNativeSpeech=(t,fin)=>{if(!fin){cap(t,'');return}if(t)heard(t);else empty()};
+async function send(t){t=t.trim();if(!t||busy){setState('idle');return}
+ const c=localCmd(t);if(c){cap(t,c.say);if(c.say)say(c.say);else{try{speechSynthesis.cancel()}catch(e){}setState('idle')}if(c.run)c.run();return}
+ const s=Math.ceil((until-Date.now())/1000);if(s>0){cap(t,'Cool down: wait '+s+'s');say(tx('Please wait '+s+' seconds.','कृपया '+s+' सेकंड रुकिए।'));return}
+ busy=true;cap(t,'');setState('think');
+ try{const j=await api('/chat','POST',{messages:[...msgs.slice(-8),{role:'user',content:t}]});
+  msgs.push({role:'user',content:t},{role:'assistant',content:j.text});ME.usedToday=ME.limits.daily-j.remaining;until=Date.now()+ME.limits.cooldown*1000;head();cap(t,j.text);busy=false;say(j.text)}
+ catch(e){busy=false;cap(t,e.message);if(e.data?.wait)until=Date.now()+e.data.wait*1000;if(e.data?.upgrade)plans();if(e.status===401)logout();say(e.message)}}
+function say(t){let fin=false;const done=()=>{if(fin)return;fin=true;clearTimeout(tm);setState('idle');if(localStorage.getItem('conv')==='1'&&!document.hidden)setTimeout(()=>{if(ST==='idle')orbTap()},500)};
+ if(!window.speechSynthesis){done();return}
+ try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[*_`#]/g,''));u.lang=lang();u.pitch=localStorage.getItem('voice')==='karan'?0.75:1.1;
+  u.onstart=()=>setState('speak');u.onend=done;u.onerror=done;tm=setTimeout(done,Math.max(4000,t.length*150+4000));setState('speak');speechSynthesis.speak(u)}catch(e){done()}}
+const tx=(en,hi)=>lang().startsWith('hi')?hi:en;
+const esc2=x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function act(type,arg){
+ if(NB&&NB.act)return NB.act(type,String(arg));
+ const q=encodeURIComponent(arg),W={youtube:'https://www.youtube.com',google:'https://www.google.com',maps:'https://maps.google.com',whatsapp:'https://web.whatsapp.com',gmail:'https://mail.google.com',instagram:'https://www.instagram.com',spotify:'https://open.spotify.com'};
+ const go=u=>{window.open(u,'_blank');return true};
+ if(type==='app')return W[String(arg).toLowerCase()]?go(W[String(arg).toLowerCase()]):false;
+ if(type==='web')return go('https://www.google.com/search?q='+q);
+ if(type==='music')return go('https://www.youtube.com/results?search_query='+q);
+ if(type==='nav')return go('https://www.google.com/maps/dir/?api=1&destination='+q);
+ return false}
+function localCmd(t){
+ const s=t.toLowerCase().trim().replace(/[.!?।]+$/,'');let m;
+ const R=(say,f)=>({say,run:f?()=>setTimeout(()=>{if(f()===false)cap('',tx('That isn’t available on this device.','यह इस डिवाइस पर उपलब्ध नहीं है।'))},900):null});
+ if(/^(stop|cancel|quiet|chup|ruko|ruk jao|रुको|चुप|बस)$/.test(s))return {say:'',run:null};
+ if(/what('?s| is) the time|what time|time kya|kitne baje|कितने बजे|टाइम क्या/.test(s))return R(tx('It’s '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}),'अभी '+new Date().toLocaleTimeString('hi-IN',{hour:'numeric',minute:'2-digit'})+' हुए हैं'));
+ if(/what('?s| is) (the )?date|today'?s date|what day|aaj kya|आज की तारीख|आज कौन सा दिन/.test(s))return R(tx('Today is '+new Date().toLocaleDateString([],{weekday:'long',day:'numeric',month:'long'}),'आज '+new Date().toLocaleDateString('hi-IN',{weekday:'long',day:'numeric',month:'long'})+' है'));
+ if(/torch|flash ?light|टॉर्च|टोर्च/.test(s)){const on=!/\boff\b|band|बंद|बुझा/.test(s);return R(tx('Torch '+(on?'on':'off'),'टॉर्च '+(on?'चालू':'बंद')),()=>act('torch',on?'on':'off'))}
+ if(/volume (up|down)|(awaaz|आवाज़|आवाज) (badha|बढ़ा|kam|कम)|louder|quieter/.test(s)){const up=/up|badha|बढ़ा|louder/.test(s);return R(tx('Volume '+(up?'up':'down'),'आवाज़ '+(up?'बढ़ा दी':'कम कर दी')),()=>act('volume',up?'up':'down'))}
+ if(/alarm|अलार्म/.test(s)){m=s.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|a\.m\.|p\.m\.|बजे)?/);if(!m)return R(tx('Say the time, like set alarm for 7:30 am.','समय बताइए, जैसे सुबह 7:30 का अलार्म लगाओ।'));
+  let h=+m[1],mi=+(m[2]||0);if(/p/.test(m[3]||'')&&h<12)h+=12;if(/a/.test(m[3]||'')&&h===12)h=0;if(h>23||mi>59)return R(tx('That time isn’t valid.','यह समय सही नहीं है।'));
+  return R(tx('Alarm set for '+h+':'+String(mi).padStart(2,'0'),'अलार्म '+h+':'+String(mi).padStart(2,'0')+' पर लगा दिया'),()=>act('alarm',h+':'+mi))}
+ if(/timer|टाइमर/.test(s)){m=s.match(/(\d+)\s*(sec|second|min|minute|hour|hr|सेकंड|मिनट|घंटे)/);if(!m)return R(tx('Say how long, like timer for 5 minutes.','बताइए कितनी देर, जैसे 5 मिनट का टाइमर।'));
+  const n=+m[1],u=m[2],sec=/^(sec|सेकंड)/.test(u)?n:/^(min|मिनट)/.test(u)?n*60:n*3600;return R(tx('Timer started','टाइमर शुरू कर दिया'),()=>act('timer',sec))}
+ m=s.match(/^(?:whatsapp|send whatsapp)\s+(\+?\d[\d\s]{6,})\s*(.*)$/);if(m)return R(tx('Opening WhatsApp','WhatsApp खोल रहा हूँ'),()=>act('wa',m[1].replace(/\s/g,'')+'|'+m[2]));
+ m=s.match(/^(?:call|dial|phone)\s+(\+?[\d\s\-]{5,})$/);if(m)return R(tx('Calling','कॉल लगा रहा हूँ'),()=>act('call',m[1].replace(/[\s\-]/g,'')));
+ if(/^(?:call|dial|phone)\b|फोन करो|call karo|कॉल करो/.test(s))return R(tx('Opening the dialer. Say a phone number to call it directly.','डायलर खोल रहा हूँ। सीधे कॉल के लिए नंबर बोलिए।'),()=>act('call',''));
+ m=s.match(/^(?:navigate to|directions to|take me to|route to|go to)\s+(.+)$/)||s.match(/^(.+?)\s+(?:ka rasta|ka route|le chalo|ले चलो|का रास्ता)$/);if(m)return R(tx('Starting navigation to '+m[1],m[1]+' के लिए रास्ता दिखा रहा हूँ'),()=>act('nav',m[1]));
+ m=s.match(/^play\s+(.+?)(?:\s+on youtube)?$/)||s.match(/^(.+?)\s+(?:bajao|chalao|bajana|बजाओ|चलाओ)$/);if(m)return R(tx('Playing '+m[1],m[1]+' चला रहा हूँ'),()=>act('music',m[1]));
+ m=s.match(/^(?:search for|search|google)\s+(.+)$/)||s.match(/^(.+?)\s+(?:search karo|सर्च करो|google karo)$/);if(m)return R(tx('Searching for '+m[1],m[1]+' खोज रहा हूँ'),()=>act('web',m[1]));
+ m=s.match(/^(?:open|launch|start)\s+(.+)$/)||s.match(/^(.+?)\s+(?:kholo|khol do|khol|open karo|खोलो|खोल दो|खोल)$/)||s.match(/^(?:खोलो|खोल)\s+(.+)$/);
+ if(m){const n=m[1].trim();if(/^camera|कैमरा/.test(n))return R(tx('Opening the camera','कैमरा खोल रहा हूँ'),()=>act('camera',''));
+  if(/^(wi-?fi|bluetooth)/.test(n))return R(tx('Opening settings','सेटिंग खोल रहा हूँ'),()=>act('settings',/blue/.test(n)?'bluetooth':'wifi'));
+  return R(tx('Opening '+n,n+' खोल रहा हूँ'),()=>act('app',n))}
+ return null}
+function convOn(){return localStorage.getItem('conv')==='1'&&!document.hidden}
+function relisten(ms=400){if(convOn())setTimeout(()=>{if(ST==='idle')listen()},ms)}
+function empty(){setState('idle');if(Date.now()-t0<1500){if(++fails>=6){localStorage.setItem('conv','0');convLabel();fails=0;return}}else fails=0;relisten()}
+function heard(t){fails=0;const w=(localStorage.getItem('wake')||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
+ if(convOn()&&w.length&&!awake){const m=t.toLowerCase().match(new RegExp('(?:^|\\s)(?:hey|hi|ok|okay)?\\s*(?:'+w.map(esc2).join('|')+')\\b[,.!]?\\s*(.*)$'));
+  if(!m){setState('idle');relisten();return}
+  t=m[1].trim();if(!t){awake=true;cap('','');say(tx('Yes?','जी?'));return}}
+ awake=false;send(t)}
+function toggleConv(){localStorage.setItem('conv',localStorage.getItem('conv')==='1'?'0':'1');convLabel();if(localStorage.getItem('conv')==='1'&&ST==='idle')orbTap()}
+function convLabel(){$('cv').textContent='Always listening: '+(localStorage.getItem('conv')==='1'?'on':'off')}
+function menu(){const u=ME.user;
+ api('/history').then(h=>{const c=$('hc');if(c)c.checked=h.saveHistory}).catch(()=>{});
+ panel(`<h3>${esc(u.email)}</h3><p class="m">${u.plan==='free'?'Free plan':'Pro until '+esc((u.planUntil||'').slice(0,10))} · ${ME.limits.daily-ME.usedToday} AI requests left today</p>
+ <label>Voice</label><select id="vc" onchange="localStorage.setItem('voice',this.value)"><option value="tara">Tara ♀</option><option value="karan">Karan ♂</option></select>
+ <label>Language</label><select id="lg" onchange="localStorage.setItem('lang',this.value)"><option value="en-US">English</option><option value="hi-IN">हिन्दी</option><option value="en-IN">English (India)</option></select>
+ <label>Wake name (optional, for always listening)</label><input id="wk" placeholder="e.g. Jarvis, Friday, Rocky" onchange="localStorage.setItem('wake',this.value)">
+ <div class="line"><span>Show captions</span><input type="checkbox" id="cp" style="width:auto;margin:0" onchange="localStorage.setItem('cap',this.checked?'1':'0');setState(ST)"></div>
+ <div class="line"><span>Remember our conversations (7 days)</span><input type="checkbox" id="hc" style="width:auto;margin:0" onchange="api('/history/consent','PUT',{on:this.checked})"></div>
+ <button class="g" style="width:100%;margin-bottom:8px" onclick="api('/history','DELETE').then(()=>{msgs=[];closeSheet()})">Forget my conversations</button>
+ <button style="width:100%" onclick="plans()">Upgrade to Pro</button>
+ <label style="display:block;margin-top:12px">Redeem code</label><input id="rc"><button class="g" style="width:100%" onclick="redeem()">Redeem</button>
+ <button class="g" style="width:100%;margin-top:12px" onclick="logout()">Logout</button>`);
+ $('vc').value=localStorage.getItem('voice')||'tara';$('wk').value=localStorage.getItem('wake')||'';$('lg').value=lang();$('cp').checked=localStorage.getItem('cap')==='1'}
+async function redeem(){try{await api('/redeem','POST',{code:$('rc').value});ME=await api('/me');head();ads();closeSheet();cap('','Pro activated. Thank you!')}catch(e){alert(e.message)}}
+async function plans(){try{const p=await api('/plans');if(!p.enabled||!p.plans.length){panel('<h3>Upgrade to Pro</h3><p>Online payments aren’t open yet. If you have a redeem code, enter it in the menu.</p>');return}
+ panel('<h3>Upgrade to Pro</h3><p class="m">More messages and a shorter cool down. No ads.</p>'+p.plans.map(x=>`<div class="plan"><span><b>${esc(x.name)}</b><br><span class="m">${x.days} days</span></span><button onclick="pay('${esc(x.id)}')">₹${x.price}</button></div>`).join(''))}catch(e){alert(e.message)}}
+async function pay(id){try{const j=await api('/pay/create','POST',{planId:id,returnUrl:location.origin});window.open(j.payUrl,'_blank');panel('<h3>Waiting for payment…</h3><p class="m">Finish paying in the browser, then come back here. This updates by itself.</p>');
+ for(let i=0;i<75;i++){await new Promise(r=>setTimeout(r,4000));const s=await api('/pay/status/'+j.orderId);if(s.status==='paid'){ME=await api('/me');head();ads();panel('<h3>You are Pro now</h3>');return}if(s.status==='failed'){panel('<h3>Payment failed</h3>');return}}}catch(e){alert(e.message)}}
+boot();
+</script></body></html>
