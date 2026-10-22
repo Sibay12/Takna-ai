@@ -12,6 +12,12 @@ const schema = z.object({
   ADMIN_BOOTSTRAP_SECRET: z.string().min(16).optional(),
   GEMINI_API_KEY: z.string().min(1).optional(),
   INITIAL_SUPER_ADMIN_EMAIL: z.string().email().optional(),
+  KEEP_ALIVE: z.enum(["true", "false"]).default("true"),
+  PING_URL: z.string().url().optional(),
+  RENDER_EXTERNAL_URL: z.string().url().optional(),
+  GEMINI_MODEL: z.string().regex(/^[A-Za-z0-9._-]{1,60}$/).default("gemini-flash-latest"),
+  AI_DAILY_REQUESTS: z.coerce.number().int().min(0).max(100000).default(30),
+  AI_MAX_OUTPUT_TOKENS: z.coerce.number().int().min(64).max(8192).default(2048),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
 });
 
@@ -25,6 +31,10 @@ export interface Config {
   adminBootstrapSecret?: string;
   geminiApiKey?: string;
   initialSuperAdminEmail?: string;
+  keepAliveUrl?: string;
+  geminiModel: string;
+  aiDailyRequests: number;
+  aiMaxOutputTokens: number;
   logLevel: string;
 }
 
@@ -51,6 +61,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     adminBootstrapSecret: d.ADMIN_BOOTSTRAP_SECRET,
     geminiApiKey: d.GEMINI_API_KEY,
     initialSuperAdminEmail: d.INITIAL_SUPER_ADMIN_EMAIL?.toLowerCase(),
+    keepAliveUrl: d.KEEP_ALIVE === "true" && d.NODE_ENV === "production" ? (d.PING_URL ?? d.RENDER_EXTERNAL_URL) : undefined,
+    geminiModel: d.GEMINI_MODEL,
+    aiDailyRequests: d.AI_DAILY_REQUESTS,
+    aiMaxOutputTokens: d.AI_MAX_OUTPUT_TOKENS,
     logLevel: d.LOG_LEVEL,
   };
 }

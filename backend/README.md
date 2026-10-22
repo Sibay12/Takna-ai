@@ -19,7 +19,10 @@ Node.js + TypeScript + Express + MongoDB. Product of TAKNA TECHNOLOGY (SIBAYAN E
 | FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY | yes | Firebase Admin SDK (token verification) |
 | CORS_ORIGINS | no | comma-separated admin panel origins; no wildcard |
 | ADMIN_BOOTSTRAP_SECRET | for bootstrap | min 16 chars, used only by `npm run admin:bootstrap` |
-| GEMINI_API_KEY | Phase 5 | server-side only |
+| GEMINI_API_KEY | for AI | server-side only; never returned or logged |
+| GEMINI_MODEL | no | default `gemini-flash-latest` (alias). Check `GET /admin/gemini` for models your key can use; Google retires models (2.5 family ended 16 Oct 2026) |
+| AI_DAILY_REQUESTS | no | interim per-user daily limit, default 30 (replaced by plan entitlements in Phase 10) |
+| AI_MAX_OUTPUT_TOKENS | no | default 2048 |
 | LOG_LEVEL | no | default info |
 
 Config errors list variable names and rules only, never values.
@@ -44,7 +47,8 @@ Roles live only in the database. On Render Free (no shell) set `INITIAL_SUPER_AD
 With a shell elsewhere you can instead run `npm run admin:bootstrap -- you@example.com --secret=<ADMIN_BOOTSTRAP_SECRET>`.
 
 ## Render
+Auto-ping (keep-alive): on Render the server pings its own `/health` every 10 minutes (uses `RENDER_EXTERNAL_URL`, production only; set `KEEP_ALIVE=false` to disable). NOTE: this reverses the original spec's "no keep-alive" rule at the owner's request. Render Free gives 750 instance-hours per month shared by ALL free web services in your workspace; one always-awake service uses ~720, so keeping several awake can exhaust the quota and Render suspends them until next month. An external pinger (e.g. UptimeRobot on `/health`) also works and can wake a sleeping instance.
 Push the WHOLE `takna-ai` folder to GitHub (`render.yaml` must be in the repo root; it builds `backend/`). In Render: New > Blueprint > pick the repo. Build errors appear in the Render build log. Set secrets in the Render dashboard. Free instances sleep when idle; no keep-alive pings are used. Retention does not depend on Render being awake (Atlas TTL).
 
 ## Not done yet
-Gemini routes, subscriptions/entitlements, TaknaPay, admin dashboard/plans/settings/audit-log routes. See `docs/PROGRESS.txt`.
+Streaming, subscriptions/entitlements, TaknaPay, admin dashboard/plans/settings/audit-log routes. See `docs/PROGRESS.txt`.

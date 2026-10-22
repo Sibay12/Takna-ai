@@ -1,15 +1,17 @@
 TAKNA AI - PROGRESS REPORT
-Updated: 2026-10-21  |  Version: backend v0.1.1
+Updated: 2026-10-22  |  Version: backend v0.2.2
 (This file is updated and shipped with every delivery.)
 
-OVERALL (approx., by the 14 phases in the master prompt): about 1.5 of 14 phases.
+OVERALL (approx., by the 14 phases in the master prompt): about 2.5 of 14 phases.
+DEPLOY STATUS: v0.1.1 is live on Render (https://takna-ai.onrender.com); user confirmed /ready = ready (DB connected).
+v0.2.0/v0.2.1 (this zip) add Gemini and voice-mode replies and are NOT yet deployed.
 
 PHASE STATUS
  1  Inspect repo ........................ N/A (fresh project; logo received)
  2  Android foundation/UI ............... NOT STARTED
  3  Google + email auth (Android) ....... NOT STARTED (backend token verification DONE)
  4  Backend + MongoDB + ai_ collections . DONE (written, NOT yet executed)
- 5  Gemini integration .................. NOT STARTED
+ 5  Gemini integration .................. DONE in backend (written, NOT yet run): /ai/chat, /ai/code, /usage, /ai/status, admin /admin/gemini; streaming + Android settings screen still to do
  6  Voice / app control / YouTube ....... NOT STARTED
  7  Coding workspace ................... NOT STARTED (backend project/file APIs DONE)
  8  Admin Panel (Next.js) ............... NOT STARTED (backend: users list, suspend, retention DONE)
@@ -53,4 +55,23 @@ CHANGES IN v0.1.1
  - Render Free has no shell: first super admin via INITIAL_SUPER_ADMIN_EMAIL env (verified email, only while none exists, audited).
    db:inspect / admin:bootstrap scripts need a shell, so they are optional.
 
-NEXT STEP: deploy to Render, send build log/errors; then Phase 5 (Gemini + /ai/chat), then Android foundation.
+CHANGES IN v0.2.0
+ - Gemini provider via official REST API (key in header only), error mapping (auth, rate limit, timeout, unsupported model, blocked, network).
+ - POST /ai/chat stores user+assistant messages (own 7-day expiry each); POST /ai/code is not stored.
+ - Concurrency-safe daily quota (ai_ai_usage, unique owner+day index); failed AI calls are refunded.
+ - New env (optional): GEMINI_MODEL (default gemini-flash-latest), AI_DAILY_REQUESTS (30), AI_MAX_OUTPUT_TOKENS (2048).
+ - Gemini 2.5 models were shut down 16 Oct 2026; if the default alias fails, open /admin/gemini to see usable models and set GEMINI_MODEL.
+ - New tests: gemini, usage, AI routes (still not executed).
+
+CHANGES IN v0.2.1
+ - Voice-only mode support: POST /ai/chat accepts mode="voice" (short, plain, speakable replies, capped output).
+ - Voice-only screen itself (orb + mic only, spoken replies, text box hidden) is an Android task: planned in Phase 2/6.
+   Rules: mic only when user taps; no silent recording; stop-speaking button always available.
+
+CHANGES IN v0.2.2
+ - Auto-ping keep-alive: server pings its own /health every 10 min on Render (production only, auto-uses RENDER_EXTERNAL_URL, KEEP_ALIVE=false disables).
+   Owner request; overrides the original spec rule. Caveat: Render Free = 750 hrs/month shared across ALL free web services.
+ - Data is not lost when Render sleeps: it lives in MongoDB Atlas. (Atlas free M0 has no automatic backups; export manually if needed.)
+ - Accessibility features (search inside other apps, screen reading) approved as an optional later Android phase.
+
+NEXT STEP: redeploy v0.2.0 on Render and send any build error; then Android foundation (Phase 2); then Phase 5 (Gemini + /ai/chat), then Android foundation.

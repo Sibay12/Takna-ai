@@ -2,7 +2,9 @@ import { loadConfig } from "./config/env";
 import { createLogger } from "./config/logger";
 import { createApp } from "./app";
 import { DbManager } from "./database/connection";
+import { startKeepAlive } from "./jobs/keepAlive";
 import { startRetentionJob } from "./jobs/retentionJob";
+import { GeminiProvider } from "./services/gemini";
 import { initFirebase, revokeSessions, verifyIdToken } from "./services/firebase";
 
 function main() {
@@ -17,7 +19,7 @@ function main() {
   initFirebase(config.firebase);
 
   const db = new DbManager(config.mongoUri, config.dbName, log);
-  const app = createApp({ corsOrigins: config.corsOrigins, db, verifyToken: verifyIdToken, revokeSessions, log, initialSuperAdminEmail: config.initialSuperAdminEmail });
+  const app = createApp({ corsOrigins: config.corsOrigins, db, verifyToken: verifyIdToken, revokeSessions, log, initialSuperAdminEmail: config.initialSuperAdminEmail, ai: new GeminiProvider(config.geminiApiKey, config.geminiModel), aiLimits: { dailyRequests: config.aiDailyRequests, maxOutputTokens: config.aiMaxOutputTokens } });
 
   const server = app.listen(config.port, "0.0.0.0", () => log.info({ port: config.port }, "server listening"));
   server.requestTimeout = 60_000;
@@ -25,6 +27,7 @@ function main() {
 
   void db.connectWithRetry(); // /health works immediately; /ready flips once DB is initialized
   const stopJob = startRetentionJob(db, log);
+  const stopPing = config.keepAliveUrl ? startKeepAlive({ url: config.keepAliveUrl, log }) : undefined;
 
   let shuttingDown = false;
   const shutdown = (signal: string) => {
@@ -32,6 +35,7 @@ function main() {
     shuttingDown = true;
     log.info({ signal }, "shutting down");
     stopJob();
+    stopPing?.();
     const force = setTimeout(() => process.exit(1), 10_000);
     force.unref();
     server.close(() => {

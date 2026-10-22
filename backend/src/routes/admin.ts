@@ -8,8 +8,9 @@ import type { DbProvider, UserDoc } from "../types";
 import { forbidden, notFound } from "../utils/errors";
 import { ah, escapeRegex, parse } from "../utils/http";
 import { validateUid } from "../utils/ids";
+import type { AiProvider } from "../services/gemini";
 
-export function adminRouter(deps: { db: DbProvider; revokeSessions: (uid: string) => Promise<void>; log: { warn: (o: object, m: string) => void } }): Router {
+export function adminRouter(deps: { db: DbProvider; ai: AiProvider; revokeSessions: (uid: string) => Promise<void>; log: { warn: (o: object, m: string) => void } }): Router {
   const { db } = deps;
   const r = Router();
   const admins = requireRole("ADMIN", "SUPER_ADMIN");
@@ -31,6 +32,23 @@ export function adminRouter(deps: { db: DbProvider; revokeSessions: (uid: string
       messagesMissingExpiry: noExpiry,
       lastCleanup: cleanupState,
     });
+  }));
+
+  // Provider status + live connection test + models this key can use. Never returns the key.
+  r.get("/admin/gemini", admins, ah(async (_req, res) => {
+    const ai = deps.ai;
+    let connection: { ok: boolean; error?: string } = { ok: false, error: "ai_not_configured" };
+    let models: string[] | null = null;
+    if (ai.configured) {
+      try {
+        await ai.sendMessage([{ role: "user", content: "Reply with: OK" }], { maxOutputTokens: 16 });
+        connection = { ok: true };
+      } catch (e) {
+        connection = { ok: false, error: (e as { code?: string }).code ?? "error" };
+      }
+      try { models = await ai.listModels(); } catch { models = null; }
+    }
+    res.json({ configured: ai.configured, model: ai.model, connection, availableModels: models });
   }));
 
   r.get("/admin/users", admins, ah(async (req, res) => {

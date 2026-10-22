@@ -83,3 +83,12 @@ export interface DbProvider {
   getDb(): Db;
   ping(): Promise<boolean>;
 }
+
+export interface UsageDoc {
+  _id?: ObjectId;
+  ownerId: string;
+  day: string; // UTC YYYY-MM-DD
+  count: number;
+  createdAt: Date;
+  updatedAt: Date;
+}

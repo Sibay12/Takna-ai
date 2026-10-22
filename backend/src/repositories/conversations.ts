@@ -78,3 +78,14 @@ export async function deleteConversationNow(db: Db, ownerId: string, id: ObjectI
   }
   return { deletedMessages: m.deletedCount, deletedConversation: true, confirmed: true };
 }
+
+/** Newest-first window re-sorted oldest-first, expired messages excluded. */
+export async function recentMessages(db: Db, ownerId: string, id: ObjectId, n: number, now = new Date()) {
+  await getOwnedConversation(db, ownerId, id, now);
+  const rows = await col<MessageDoc>(db, "ai_messages")
+    .find({ ownerId, conversationId: id, ...unexpired(now) })
+    .sort({ createdAt: -1 })
+    .limit(n)
+    .toArray();
+  return rows.reverse();
+}
