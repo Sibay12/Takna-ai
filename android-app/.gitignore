@@ -6,4 +6,4 @@ local.properties
 captures/
 *.jks
 *.keystore
-google-services.json
+!app/takna-debug.keystore

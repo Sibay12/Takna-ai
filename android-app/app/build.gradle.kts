@@ -16,6 +16,17 @@ android {
         versionName = "0.1.0"
     }
 
+    // Fixed DEBUG-ONLY key (public on purpose) so the SHA-1 stays the same on every CI build.
+    // Google sign-in needs a stable SHA-1. Never use this key for a release.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("takna-debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -44,5 +55,17 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.navigation:navigation-compose:2.8.5")
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
+}
+
+// Firebase is switched on only when google-services.json is present. Without it the app still builds
+// and clearly says "sign-in not configured".
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }
