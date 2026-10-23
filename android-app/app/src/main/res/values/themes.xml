@@ -1,0 +1,12 @@
+<resources>
+    <style name="Theme.Takna" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/takna_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+    <style name="Theme.Takna.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/takna_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/takna_emblem</item>
+        <item name="postSplashScreenTheme">@style/Theme.Takna</item>
+    </style>
+</resources>

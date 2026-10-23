@@ -1,5 +1,5 @@
 TAKNA AI - PROGRESS REPORT
-Updated: 2026-10-22  |  Version: backend v0.2.2
+Updated: 2026-10-23  |  Version: backend v0.2.2 (LIVE on Render), android-app v0.1.0 (preview)
 (This file is updated and shipped with every delivery.)
 
 OVERALL (approx., by the 14 phases in the master prompt): about 2.5 of 14 phases.
@@ -8,7 +8,7 @@ v0.2.0/v0.2.1 (this zip) add Gemini and voice-mode replies and are NOT yet deplo
 
 PHASE STATUS
  1  Inspect repo ........................ N/A (fresh project; logo received)
- 2  Android foundation/UI ............... NOT STARTED
+ 2  Android foundation/UI ............... WRITTEN in android-app/ (NOT yet built; CI workflow builds debug APK)
  3  Google + email auth (Android) ....... NOT STARTED (backend token verification DONE)
  4  Backend + MongoDB + ai_ collections . DONE (written, NOT yet executed)
  5  Gemini integration .................. DONE in backend (written, NOT yet run): /ai/chat, /ai/code, /usage, /ai/status, admin /admin/gemini; streaming + Android settings screen still to do
