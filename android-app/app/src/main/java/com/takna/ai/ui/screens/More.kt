@@ -11,6 +11,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,6 +23,7 @@ import com.takna.ai.R
 import com.takna.ai.nav.Pending
 import com.takna.ai.nav.Routes
 import com.takna.ai.ui.components.AwaitingCard
+import com.takna.ai.ui.components.SignOutDialog
 import com.takna.ai.ui.components.TaknaScreen
 import com.takna.ai.ui.theme.TaknaColors
 
@@ -42,8 +47,8 @@ private val items = listOf(
 
 @Composable
 fun MoreScreen(onOpen: (String) -> Unit, canSignOut: Boolean, onSignOut: () -> Unit, onBack: () -> Unit) {
-    var confirm by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    if (confirm) com.takna.ai.ui.components.SignOutDialog(onConfirm = { confirm = false; onSignOut() }, onDismiss = { confirm = false })
+    var confirm by remember { mutableStateOf(false) }
+    if (confirm) SignOutDialog(onConfirm = { confirm = false; onSignOut() }, onDismiss = { confirm = false })
     TaknaScreen(title = "More", onBack = onBack) { pad ->
         Column(Modifier.fillMaxSize().padding(pad).verticalScroll(rememberScrollState())) {
             items.forEach { (label, route) ->
