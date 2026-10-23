@@ -12,7 +12,20 @@
           "package_name": "com.takna.ai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "236899560463-97pc5bqbdkagpfco1svmnqdtaesit25f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.takna.ai",
+            "certificate_hash": "d6021f5cea101fc6398de19b24b0bb21e475b9f3"
+          }
+        },
+        {
+          "client_id": "236899560463-8l0oqf3l0qsstl4gmnm7jv7d5h0c32ds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDcrya3ahyjbw9vKfW7lOqnW8zlRptxLww"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236899560463-8l0oqf3l0qsstl4gmnm7jv7d5h0c32ds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +49,12 @@
           "package_name": "com.takna.taknaai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "236899560463-8l0oqf3l0qsstl4gmnm7jv7d5h0c32ds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDcrya3ahyjbw9vKfW7lOqnW8zlRptxLww"
@@ -39,7 +62,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "236899560463-8l0oqf3l0qsstl4gmnm7jv7d5h0c32ds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
