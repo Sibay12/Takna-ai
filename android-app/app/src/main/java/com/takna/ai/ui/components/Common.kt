@@ -34,6 +34,7 @@ fun TaknaScreen(
     title: String,
     onBack: (() -> Unit)? = null,
     snackbarHostState: SnackbarHostState? = null,
+    actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Box(Modifier.fillMaxSize().background(TaknaColors.backgroundBrush)) {
@@ -50,10 +51,12 @@ fun TaknaScreen(
                             }
                         }
                     },
+                    actions = actions,
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = Color.Transparent,
                         titleContentColor = TaknaColors.TextPrimary,
                         navigationIconContentColor = TaknaColors.Cyan,
+                        actionIconContentColor = TaknaColors.Cyan,
                     ),
                 )
             },
@@ -80,4 +83,15 @@ fun AwaitingCard(heading: String, body: String, modifier: Modifier = Modifier) {
             )
         }
     }
+}
+
+@Composable
+fun SignOutDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Sign out?") },
+        text = { Text("You can sign in again any time.") },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = onConfirm) { Text("Sign out") } },
+        dismissButton = { androidx.compose.material3.TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
 }

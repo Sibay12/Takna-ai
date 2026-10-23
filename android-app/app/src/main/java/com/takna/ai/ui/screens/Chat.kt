@@ -35,7 +35,7 @@ import com.takna.ai.ui.theme.TaknaColors
 private data class Msg(val fromUser: Boolean, val text: String)
 
 private const val NOT_CONNECTED =
-    "I'm not connected to the AI service yet. Replies from Gemini start working after sign-in is set up (Phase 3) and the app is linked to the backend (Phase 5)."
+    "Replies are not connected in this preview yet. They start working in an upcoming update."
 
 @Composable
 fun ChatScreen(initialMessage: String?, onBack: () -> Unit) {

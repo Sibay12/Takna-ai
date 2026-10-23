@@ -19,10 +19,10 @@ const BASE = "https://generativelanguage.googleapis.com/v1beta";
 
 function mapStatus(status: number): AppError {
   if (status === 429) return new AppError(429, "ai_rate_limited", "AI is busy right now. Please try again shortly.");
-  if (status === 401 || status === 403) return new AppError(502, "ai_provider_auth", "AI provider credentials were rejected.");
-  if (status === 404) return new AppError(502, "ai_model_unsupported", "The configured AI model is not available.");
-  if (status === 400) return new AppError(502, "ai_bad_request", "The AI provider rejected the request.");
-  return new AppError(502, "ai_provider_error", "The AI provider returned an error.");
+  if (status === 401 || status === 403) return new AppError(502, "ai_provider_auth", "The AI service is temporarily unavailable.");
+  if (status === 404) return new AppError(502, "ai_model_unsupported", "The AI service is temporarily unavailable.");
+  if (status === 400) return new AppError(502, "ai_bad_request", "The AI service could not process this request.");
+  return new AppError(502, "ai_provider_error", "The AI service returned an error.");
 }
 
 /** Gemini via the official REST API (generateContent). The key is sent as a header, never logged or returned. */
@@ -53,7 +53,7 @@ export class GeminiProvider implements AiProvider {
     } catch (e) {
       if (e instanceof AppError) throw e;
       if ((e as { name?: string })?.name === "AbortError") throw new AppError(504, "ai_timeout", "The AI took too long to respond.");
-      throw new AppError(502, "ai_network_error", "Could not reach the AI provider.");
+      throw new AppError(502, "ai_network_error", "Could not reach the AI service.");
     } finally {
       clearTimeout(timer);
     }

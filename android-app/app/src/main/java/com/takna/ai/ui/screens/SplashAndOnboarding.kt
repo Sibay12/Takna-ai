@@ -58,7 +58,7 @@ fun SplashScreenUi(onDone: () -> Unit) {
 private data class OnboardingPage(val title: String, val body: String)
 
 private val pages = listOf(
-    OnboardingPage("Your intelligent assistant", "Talk or type in Hindi, English or Hinglish. TAKNA AI answers using Google Gemini."),
+    OnboardingPage("Your intelligent assistant", "Talk or type in Hindi, English or Hinglish. TAKNA AI understands you and replies in the language you use."),
     OnboardingPage("Code and build", "Create code, plan websites and keep your projects organised in the Coding Studio."),
     OnboardingPage("You stay in control", "The mic listens only when you tap it. Chats are kept for 7 days and you can delete them any time."),
 )

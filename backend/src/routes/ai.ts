@@ -58,7 +58,7 @@ export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimit
   }
 
   r.get("/ai/status", (_req, res) => {
-    res.json({ configured: ai.configured, model: ai.model, dailyRequests: limits.dailyRequests, maxOutputTokens: limits.maxOutputTokens, streaming: false });
+    res.json({ configured: ai.configured, dailyRequests: limits.dailyRequests, maxOutputTokens: limits.maxOutputTokens, streaming: false });
   });
 
   r.get("/usage", ah(async (req, res) => {

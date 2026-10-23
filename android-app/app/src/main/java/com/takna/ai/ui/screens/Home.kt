@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Menu
@@ -22,7 +23,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -42,19 +42,14 @@ import com.takna.ai.nav.Routes
 import com.takna.ai.ui.components.AiOrb
 import com.takna.ai.ui.components.AwaitingCard
 import com.takna.ai.ui.components.OrbState
+import com.takna.ai.ui.components.SignOutDialog
 import com.takna.ai.ui.components.TaknaScreen
 import com.takna.ai.ui.theme.TaknaColors
 import kotlinx.coroutines.launch
 
-private enum class Lang(val label: String, val greeting: String) {
-    Hindi("हिंदी", "नमस्ते, मैं TAKNA AI हूँ। मैं आपकी क्या मदद करूँ?"),
-    English("English", "Hello, I'm TAKNA AI. How can I help you?"),
-    Hinglish("Hinglish", "Namaste, main TAKNA AI hoon. Aaj main aapki kya help karun?"),
-}
-
 @Composable
-fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit) {
-    var lang by remember { mutableStateOf(Lang.English) }
+fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: Boolean, onSignOut: () -> Unit) {
+    var confirmSignOut by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     val snack = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -64,19 +59,23 @@ fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit) {
         if (q.isNotEmpty()) { text = ""; onChat(q) }
     }
 
-    TaknaScreen(title = "TAKNA AI", snackbarHostState = snack) { pad ->
+    if (confirmSignOut) SignOutDialog(onConfirm = { confirmSignOut = false; onSignOut() }, onDismiss = { confirmSignOut = false })
+    TaknaScreen(
+        title = "TAKNA AI",
+        snackbarHostState = snack,
+        actions = {
+            if (canSignOut) IconButton(onClick = { confirmSignOut = true }) {
+                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Sign out")
+            }
+        },
+    ) { pad ->
         Column(
             Modifier.fillMaxSize().padding(pad).padding(horizontal = 20.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Lang.entries.forEach { l ->
-                    FilterChip(selected = lang == l, onClick = { lang = l }, label = { Text(l.label) })
-                }
-            }
             AiOrb(OrbState.Idle, Modifier.padding(top = 12.dp), orbSize = 200.dp)
             Text(
-                lang.greeting,
+                "Hello, I'm TAKNA AI. How can I help you?",
                 color = TaknaColors.TextPrimary,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
             )

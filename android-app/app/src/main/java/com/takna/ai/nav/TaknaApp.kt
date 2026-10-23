@@ -64,6 +64,8 @@ fun TaknaApp() {
             HomeScreen(
                 onOpen = { nav.navigate(it) },
                 onChat = { nav.navigate(Routes.chat(it)) },
+                canSignOut = auth.signedIn,
+                onSignOut = { auth.signOut(); toLogin() },
             )
         }
         composable(
@@ -72,7 +74,9 @@ fun TaknaApp() {
         ) { entry ->
             ChatScreen(initialMessage = entry.arguments?.getString("q"), onBack = back)
         }
-        composable(Routes.More) { MoreScreen(onOpen = { nav.navigate(it) }, onBack = back) }
+        composable(Routes.More) {
+            MoreScreen(onOpen = { nav.navigate(it) }, canSignOut = auth.signedIn, onSignOut = { auth.signOut(); toLogin() }, onBack = back)
+        }
         composable(Routes.About) { AboutScreen(onBack = back) }
         pendingScreens.forEach { (route, info) ->
             composable(route) { PendingScreen(info, onBack = back) }

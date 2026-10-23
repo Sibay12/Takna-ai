@@ -24,7 +24,6 @@ import com.takna.ai.ui.theme.TaknaColors
 
 private val items = listOf(
     "Voice settings" to Routes.VoiceSettings,
-    "Gemini settings" to Routes.GeminiSettings,
     "App launcher" to Routes.AppLauncher,
     "YouTube assistant" to Routes.YouTube,
     "Coding Studio" to Routes.CodingStudio,
@@ -42,7 +41,9 @@ private val items = listOf(
 )
 
 @Composable
-fun MoreScreen(onOpen: (String) -> Unit, onBack: () -> Unit) {
+fun MoreScreen(onOpen: (String) -> Unit, canSignOut: Boolean, onSignOut: () -> Unit, onBack: () -> Unit) {
+    var confirm by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    if (confirm) com.takna.ai.ui.components.SignOutDialog(onConfirm = { confirm = false; onSignOut() }, onDismiss = { confirm = false })
     TaknaScreen(title = "More", onBack = onBack) { pad ->
         Column(Modifier.fillMaxSize().padding(pad).verticalScroll(rememberScrollState())) {
             items.forEach { (label, route) ->
@@ -52,6 +53,13 @@ fun MoreScreen(onOpen: (String) -> Unit, onBack: () -> Unit) {
                     modifier = Modifier.fillMaxWidth().clickable { onOpen(route) }.padding(horizontal = 24.dp, vertical = 16.dp),
                 )
                 HorizontalDivider(color = TaknaColors.NavyLight)
+            }
+            if (canSignOut) {
+                Text(
+                    "Sign out",
+                    color = TaknaColors.Danger,
+                    modifier = Modifier.fillMaxWidth().clickable { confirm = true }.padding(horizontal = 24.dp, vertical = 16.dp),
+                )
             }
         }
     }
