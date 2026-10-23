@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "236899560463",
+    "project_id": "takna-ai",
+    "storage_bucket": "takna-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236899560463:android:2aae9b221b9c7d0200877a",
+        "android_client_info": {
+          "package_name": "com.takna.ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcrya3ahyjbw9vKfW7lOqnW8zlRptxLww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:236899560463:android:64578ae8dd7ec97700877a",
+        "android_client_info": {
+          "package_name": "com.takna.taknaai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcrya3ahyjbw9vKfW7lOqnW8zlRptxLww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
