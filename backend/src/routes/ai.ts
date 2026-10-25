@@ -5,6 +5,8 @@ import { appendMessage, createConversation, recentMessages } from "../repositori
 import { consumeRequest, getUsedToday, refundRequest } from "../repositories/usage";
 import { chatSystem, codeSystem, codeUserPrompt } from "../services/aiTasks";
 import type { AiProvider, ChatTurn } from "../services/gemini";
+import type { ProviderGateway } from "../services/providerGateway";
+import { sanitizeReply } from "../services/sanitize";
 import type { DbProvider } from "../types";
 import { badRequest } from "../utils/errors";
 import { ah, parse } from "../utils/http";
@@ -19,7 +21,7 @@ export interface AiLimits {
 const lang = z.enum(["auto", "hi", "en", "hinglish"]).default("auto");
 
 const chatSchema = z
-  .object({ conversationId: z.string().optional(), message: z.string().trim().min(1).max(8000), language: lang, mode: z.enum(["text", "voice"]).default("text") })
+  .object({ conversationId: z.string().optional(), message: z.string().trim().min(1).max(8000), language: lang, mode: z.enum(["text", "voice"]).default("text"), modelId: z.string().max(40).optional() })
   .strict();
 
 const codeSchema = z
@@ -27,14 +29,16 @@ const codeSchema = z
     task: z.enum(["generate", "analyze", "debug", "website", "summarize"]),
     prompt: z.string().trim().min(1).max(12000),
     language: lang,
+    modelId: z.string().max(40).optional(),
     files: z.array(z.object({ path: z.string(), content: z.string().max(100_000) })).max(10).default([]),
   })
   .strict();
 
 const HISTORY_TURNS = 20;
 
-export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimits }): Router {
-  const { db, ai, limits } = deps;
+export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimits; gateway?: ProviderGateway }): Router {
+  const { db, ai, limits, gateway } = deps;
+  const pick = async (modelId?: string): Promise<AiProvider> => (gateway ? gateway.resolve(modelId) : ai);
   const r = Router();
   const perUser = rateLimit({
     windowMs: 60_000,
@@ -57,9 +61,15 @@ export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimit
     }
   }
 
-  r.get("/ai/status", (_req, res) => {
-    res.json({ configured: ai.configured, dailyRequests: limits.dailyRequests, maxOutputTokens: limits.maxOutputTokens, streaming: false });
-  });
+  r.get("/ai/status", ah(async (_req, res) => {
+    const configured = gateway ? (await gateway.publicModels()).length > 0 : ai.configured;
+    res.json({ configured, dailyRequests: limits.dailyRequests, maxOutputTokens: limits.maxOutputTokens, streaming: false });
+  }));
+
+  // Customers only ever get the display names chosen in the admin panel.
+  r.get("/ai/models", ah(async (_req, res) => {
+    res.json({ models: gateway ? await gateway.publicModels() : ai.configured ? [{ id: "default", displayName: "TAKNA AI" }] : [] });
+  }));
 
   r.get("/usage", ah(async (req, res) => {
     const used = await getUsedToday(db.getDb(), req.auth!.uid);
@@ -77,11 +87,13 @@ export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimit
         )
       : [];
     const turns: ChatTurn[] = [...history, { role: "user", content: b.message }];
+    const provider = await pick(b.modelId);
 
-    const { result: reply, used } = await guarded(owner, () =>
-      ai.sendMessage(turns, { system: chatSystem(b.language, b.mode), maxOutputTokens: b.mode === "voice" ? Math.min(limits.maxOutputTokens, 400) : limits.maxOutputTokens }),
+    const { result: raw, used } = await guarded(owner, () =>
+      provider.sendMessage(turns, { system: chatSystem(b.language, b.mode), maxOutputTokens: b.mode === "voice" ? Math.min(limits.maxOutputTokens, 400) : limits.maxOutputTokens }),
     );
 
+    const reply = sanitizeReply(raw, [provider.model]);
     const id = convId ?? (await createConversation(d, owner, b.message.slice(0, 50).trim() || "New chat"))._id;
     await appendMessage(d, owner, id, "user", b.message);
     const saved = await appendMessage(d, owner, id, "assistant", reply);
@@ -101,12 +113,14 @@ export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimit
       return { path: validateRelativePath(f.path), content: f.content };
     });
     if (total > 200_000) throw badRequest("Attached files are too large", "payload_too_large");
-    const { result: text, used } = await guarded(req.auth!.uid, () =>
-      ai.sendMessage([{ role: "user", content: codeUserPrompt(b.prompt, files) }], {
+    const provider = await pick(b.modelId);
+    const { result: rawText, used } = await guarded(req.auth!.uid, () =>
+      provider.sendMessage([{ role: "user", content: codeUserPrompt(b.prompt, files) }], {
         system: codeSystem(b.task, b.language),
         maxOutputTokens: limits.maxOutputTokens,
       }),
     );
+    const text = sanitizeReply(rawText, [provider.model]);
     res.json({ task: b.task, text, usage: { used, limit: limits.dailyRequests } });
   }));
 

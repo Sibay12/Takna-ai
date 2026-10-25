@@ -11,6 +11,7 @@ const schema = z.object({
   CORS_ORIGINS: z.string().default(""),
   ADMIN_BOOTSTRAP_SECRET: z.string().min(16).optional(),
   GEMINI_API_KEY: z.string().min(1).optional(),
+  KEY_ENCRYPTION_SECRET: z.string().min(32, "at least 32 characters").optional(),
   INITIAL_SUPER_ADMIN_EMAIL: z.string().email().optional(),
   KEEP_ALIVE: z.enum(["true", "false"]).default("true"),
   PING_URL: z.string().url().optional(),
@@ -30,6 +31,7 @@ export interface Config {
   corsOrigins: string[];
   adminBootstrapSecret?: string;
   geminiApiKey?: string;
+  keyEncryptionSecret?: string;
   initialSuperAdminEmail?: string;
   keepAliveUrl?: string;
   geminiModel: string;
@@ -60,6 +62,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     corsOrigins: d.CORS_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean),
     adminBootstrapSecret: d.ADMIN_BOOTSTRAP_SECRET,
     geminiApiKey: d.GEMINI_API_KEY,
+    keyEncryptionSecret: d.KEY_ENCRYPTION_SECRET,
     initialSuperAdminEmail: d.INITIAL_SUPER_ADMIN_EMAIL?.toLowerCase(),
     keepAliveUrl: d.KEEP_ALIVE === "true" && d.NODE_ENV === "production" ? (d.PING_URL ?? d.RENDER_EXTERNAL_URL) : undefined,
     geminiModel: d.GEMINI_MODEL,

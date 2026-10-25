@@ -9,6 +9,7 @@ export const APPROVED_COLLECTIONS = [
   "ai_conversations",
   "ai_messages",
   "ai_ai_usage",
+  "ai_ai_providers",
   "ai_subscriptions",
   "ai_subscription_plans",
   "ai_payment_transactions",

@@ -17,7 +17,7 @@ export interface AiProvider {
 
 const BASE = "https://generativelanguage.googleapis.com/v1beta";
 
-function mapStatus(status: number): AppError {
+export function mapStatus(status: number): AppError {
   if (status === 429) return new AppError(429, "ai_rate_limited", "AI is busy right now. Please try again shortly.");
   if (status === 401 || status === 403) return new AppError(502, "ai_provider_auth", "The AI service is temporarily unavailable.");
   if (status === 404) return new AppError(502, "ai_model_unsupported", "The AI service is temporarily unavailable.");

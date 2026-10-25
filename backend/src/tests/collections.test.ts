@@ -3,7 +3,7 @@ import { APPROVED_COLLECTIONS, assertApprovedCollection, col, isApprovedCollecti
 
 describe("collection allowlist", () => {
   it("has the 16 approved collections, all prefixed ai_", () => {
-    expect(APPROVED_COLLECTIONS).toHaveLength(16);
+    expect(APPROVED_COLLECTIONS).toHaveLength(17);
     for (const n of APPROVED_COLLECTIONS) expect(n.startsWith("ai_")).toBe(true);
   });
   it("accepts every approved name", () => {

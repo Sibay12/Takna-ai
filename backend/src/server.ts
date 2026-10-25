@@ -19,7 +19,7 @@ function main() {
   initFirebase(config.firebase);
 
   const db = new DbManager(config.mongoUri, config.dbName, log);
-  const app = createApp({ corsOrigins: config.corsOrigins, db, verifyToken: verifyIdToken, revokeSessions, log, initialSuperAdminEmail: config.initialSuperAdminEmail, ai: new GeminiProvider(config.geminiApiKey, config.geminiModel), aiLimits: { dailyRequests: config.aiDailyRequests, maxOutputTokens: config.aiMaxOutputTokens } });
+  const app = createApp({ corsOrigins: config.corsOrigins, db, verifyToken: verifyIdToken, revokeSessions, log, initialSuperAdminEmail: config.initialSuperAdminEmail, keyEncryptionSecret: config.keyEncryptionSecret, ai: new GeminiProvider(config.geminiApiKey, config.geminiModel), aiLimits: { dailyRequests: config.aiDailyRequests, maxOutputTokens: config.aiMaxOutputTokens } });
 
   const server = app.listen(config.port, "0.0.0.0", () => log.info({ port: config.port }, "server listening"));
   server.requestTimeout = 60_000;

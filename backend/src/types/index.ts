@@ -92,3 +92,20 @@ export interface UsageDoc {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type ProviderType = "gemini" | "anthropic" | "openai";
+
+/** A third-party AI connection managed from the admin panel. The API key is stored ENCRYPTED and never returned. */
+export interface AiProviderDoc {
+  _id: ObjectId;
+  type: ProviderType;
+  displayName: string; // the ONLY name customers ever see
+  model: string; // internal, admin-only
+  apiKeyEnc: string;
+  keyHint: string; // masked, e.g. "••••abcd"
+  enabled: boolean;
+  isDefault: boolean;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

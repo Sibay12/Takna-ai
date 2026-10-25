@@ -8,6 +8,8 @@ import { errorHandler, notFoundHandler } from "./middleware/errors";
 import { adminRouter } from "./routes/admin";
 import { aiRouter, type AiLimits } from "./routes/ai";
 import type { AiProvider } from "./services/gemini";
+import { adminProvidersRouter } from "./routes/adminProviders";
+import { ProviderGateway } from "./services/providerGateway";
 import { conversationsRouter } from "./routes/conversations";
 import { meRouter } from "./routes/me";
 import { projectsRouter } from "./routes/projects";
@@ -22,6 +24,7 @@ export interface AppDeps {
   revokeSessions: (uid: string) => Promise<void>;
   log: Logger;
   ai: AiProvider;
+  keyEncryptionSecret?: string;
   aiLimits: AiLimits;
   rateLimitMax?: number;
   initialSuperAdminEmail?: string;
@@ -57,9 +60,11 @@ export function createApp(deps: AppDeps): Express {
   api.use(plansRouter(db)); // public
   api.use(createAuth({ db, verifyToken: deps.verifyToken, initialSuperAdminEmail: deps.initialSuperAdminEmail })); // everything below needs a verified user
   api.use(meRouter(db));
-  api.use(aiRouter({ db, ai: deps.ai, limits: deps.aiLimits }));
+  const gateway = new ProviderGateway(db, deps.keyEncryptionSecret, deps.ai);
+  api.use(aiRouter({ db, ai: deps.ai, limits: deps.aiLimits, gateway }));
   api.use(projectsRouter(db));
   api.use(conversationsRouter(db));
+  api.use(adminProvidersRouter({ db, secret: deps.keyEncryptionSecret, gateway }));
   api.use(adminRouter({ db, ai: deps.ai, revokeSessions: deps.revokeSessions, log }));
   app.use("/api/v1", api);
 

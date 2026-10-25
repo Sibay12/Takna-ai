@@ -42,6 +42,7 @@ export const INDEXES: Partial<Record<CollectionName, IndexSpec[]>> = {
     },
     { key: { ownerId: 1, createdAt: -1 }, options: { name: "idx_owner_created" } },
   ],
+  ai_ai_providers: [{ key: { enabled: 1, isDefault: -1 }, options: { name: "idx_enabled_default" } }],
   ai_ai_usage: [{ key: { ownerId: 1, day: 1 }, options: { name: "uniq_owner_day", unique: true } }],
   ai_entitlement_usage: [{ key: { ownerId: 1, period: 1 }, options: { name: "uniq_owner_period", unique: true } }],
   ai_application_settings: [{ key: { key: 1 }, options: { name: "uniq_key", unique: true } }],
