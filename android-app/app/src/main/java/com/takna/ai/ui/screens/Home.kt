@@ -18,7 +18,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PlayCircle
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.AssistChip
@@ -48,7 +48,8 @@ import com.takna.ai.ui.theme.TaknaColors
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: Boolean, onSignOut: () -> Unit) {
+fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: Boolean, onSignOut: () -> Unit, loadUsage: suspend () -> String?) {
+    val usageText by androidx.compose.runtime.produceState<String?>(initialValue = null) { value = loadUsage() }
     var confirmSignOut by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     val snack = remember { SnackbarHostState() }
@@ -92,7 +93,7 @@ fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: 
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = { send() }),
                 )
-                FilledIconButton(onClick = { send() }) { Icon(Icons.Filled.Send, "Send") }
+                FilledIconButton(onClick = { send() }) { Icon(Icons.AutoMirrored.Filled.Send, "Send") }
             }
             Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 FilledIconButton(onClick = { notYet("Voice input") }, modifier = Modifier.size(64.dp)) {
@@ -123,8 +124,11 @@ fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: 
                 Modifier.fillMaxWidth().padding(top = 20.dp))
             AwaitingCard("Recent conversations", "Your chats from the last 7 days will appear here after sign-in.",
                 Modifier.fillMaxWidth().padding(top = 12.dp))
-            AwaitingCard("Plan and usage", "Not connected. Daily usage and your plan show here once you are signed in.",
-                Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 24.dp))
+            if (usageText != null) {
+                AwaitingCard("Plan and usage", usageText!!, Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 24.dp))
+            } else {
+                AwaitingCard("Plan and usage", "Sign in to see your daily usage here.", Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 24.dp))
+            }
         }
     }
 }

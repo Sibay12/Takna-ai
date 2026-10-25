@@ -65,6 +65,15 @@ fun TaknaApp() {
                 onOpen = { nav.navigate(it) },
                 onChat = { nav.navigate(Routes.chat(it)) },
                 canSignOut = auth.signedIn,
+                loadUsage = {
+                    val token = auth.repo.idToken()
+                    if (token == null) null
+                    else try {
+                        val u = com.takna.ai.api.ApiClient.usage(token)
+                        "Free plan: ${u.used} of ${u.limit} AI requests used today."
+                    } catch (e: kotlin.coroutines.cancellation.CancellationException) { throw e }
+                    catch (e: Exception) { null }
+                },
                 onSignOut = { auth.signOut(); toLogin() },
             )
         }

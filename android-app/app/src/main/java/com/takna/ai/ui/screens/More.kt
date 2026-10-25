@@ -87,7 +87,7 @@ fun AboutScreen(onBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(painterResource(R.drawable.takna_logo), "TAKNA AI logo", Modifier.fillMaxWidth(0.7f))
-            Text("Version 0.1.0 (foundation preview)", color = TaknaColors.TextMuted, modifier = Modifier.padding(top = 12.dp))
+            Text("Version 0.2.0", color = TaknaColors.TextMuted, modifier = Modifier.padding(top = 12.dp))
             Text("A product of TAKNA TECHNOLOGY", color = TaknaColors.Cyan, modifier = Modifier.padding(top = 16.dp))
             Text("SIBAYAN ENTERPRISE", color = TaknaColors.TextPrimary)
         }
