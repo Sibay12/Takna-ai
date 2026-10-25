@@ -18,8 +18,26 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
     val messages = mutableStateListOf<ChatMessage>()
     var busy by mutableStateOf(false); private set
     var usageLine by mutableStateOf<String?>(null); private set
+    val models = mutableStateListOf<AiModel>()
+    var selected by mutableStateOf<AiModel?>(null)
     private var conversationId: String? = null
     private var initialSent = false
+
+    fun loadModels() {
+        if (models.isNotEmpty() || auth.currentUser == null) return
+        viewModelScope.launch {
+            try {
+                val token = auth.idToken() ?: return@launch
+                val list = ApiClient.models(token)
+                models.clear(); models.addAll(list)
+                if (selected == null) selected = list.firstOrNull()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // The picker simply stays hidden; chatting still works with the default.
+            }
+        }
+    }
 
     fun sendInitial(text: String?) {
         if (initialSent || text.isNullOrBlank()) return
@@ -39,7 +57,7 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
             busy = true
             try {
                 val token = auth.idToken() ?: throw ApiException(401, "no_token", "")
-                val reply = ApiClient.chat(token, text, conversationId)
+                val reply = ApiClient.chat(token, text, conversationId, selected?.id)
                 if (reply.conversationId.isNotEmpty()) conversationId = reply.conversationId
                 messages.add(ChatMessage(false, reply.text))
                 usageLine = "${reply.used} / ${reply.limit} requests used today"

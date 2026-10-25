@@ -41,12 +41,30 @@ fun ChatScreen(initialMessage: String?, onBack: () -> Unit, vm: ChatViewModel = 
     val listState = rememberLazyListState()
     val messages = vm.messages
 
+    LaunchedEffect(Unit) { vm.loadModels() }
     LaunchedEffect(initialMessage) { vm.sendInitial(initialMessage) }
     LaunchedEffect(messages.size, vm.busy) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.lastIndex)
     }
 
-    TaknaScreen(title = "Chat", onBack = onBack) { pad ->
+    var menuOpen by remember { mutableStateOf(false) }
+    TaknaScreen(
+        title = "Chat",
+        onBack = onBack,
+        actions = {
+            if (vm.models.size > 1) {
+                androidx.compose.material3.TextButton(onClick = { menuOpen = true }) { Text(vm.selected?.name ?: "TAKNA AI") }
+                androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    vm.models.forEach { m ->
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(m.name) },
+                            onClick = { vm.selected = m; menuOpen = false },
+                        )
+                    }
+                }
+            }
+        },
+    ) { pad ->
         Column(Modifier.fillMaxSize().padding(pad).imePadding()) {
             LazyColumn(
                 state = listState,

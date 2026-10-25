@@ -11,6 +11,7 @@ import java.net.URL
 class ApiException(val status: Int, val code: String, override val message: String) : Exception(message)
 
 data class ChatReply(val conversationId: String, val text: String, val used: Int, val limit: Int)
+data class AiModel(val id: String, val name: String)
 data class Usage(val used: Int, val limit: Int)
 
 /** Minimal HTTPS JSON client for the TAKNA AI backend. The Firebase ID token is sent as a Bearer token; no secrets live in the app. */
@@ -51,9 +52,10 @@ object ApiClient {
             }
         }
 
-    suspend fun chat(token: String, message: String, conversationId: String?): ChatReply {
+    suspend fun chat(token: String, message: String, conversationId: String?, modelId: String? = null): ChatReply {
         val body = JSONObject().put("message", message).put("language", "auto").put("mode", "text")
         if (conversationId != null) body.put("conversationId", conversationId)
+        if (modelId != null) body.put("modelId", modelId)
         val r = call("POST", "/ai/chat", token, body)
         val usage = r.optJSONObject("usage")
         return ChatReply(
@@ -62,6 +64,11 @@ object ApiClient {
             used = usage?.optInt("used") ?: 0,
             limit = usage?.optInt("limit") ?: 0,
         )
+    }
+
+    suspend fun models(token: String): List<AiModel> {
+        val arr = call("GET", "/ai/models", token).optJSONArray("models") ?: return emptyList()
+        return (0 until arr.length()).map { arr.getJSONObject(it) }.map { AiModel(it.getString("id"), it.getString("displayName")) }
     }
 
     suspend fun usage(token: String): Usage {
