@@ -1,4 +1,4 @@
-name: Backend typecheck and tests
+name: Backend CI
 
 on:
   push:
@@ -17,7 +17,5 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-audit --no-fund
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Tests
-        run: npm test
+      - run: npm run typecheck
+      - run: npm test
