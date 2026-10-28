@@ -16,16 +16,25 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,32 +43,62 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.takna.ai.api.ChatViewModel
 import com.takna.ai.ui.components.TaknaScreen
 import com.takna.ai.ui.theme.TaknaColors
+import com.takna.ai.voice.VoiceController
+import com.takna.ai.voice.rememberMicPermission
+import kotlinx.coroutines.launch
 
 @Composable
-fun ChatScreen(initialMessage: String?, onBack: () -> Unit, vm: ChatViewModel = viewModel()) {
+fun ChatScreen(
+    initialMessage: String?,
+    onBack: () -> Unit,
+    vm: ChatViewModel = viewModel(),
+    voice: VoiceController = viewModel(),
+) {
     var text by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
     val messages = vm.messages
+    val snack = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) { vm.loadModels() }
-    LaunchedEffect(initialMessage) { vm.sendInitial(initialMessage) }
+    LaunchedEffect(initialMessage) { vm.sendInitial(initialMessage, voiceMode = voice.autoSpeak, language = voice.replyLanguage) }
     LaunchedEffect(messages.size, vm.busy) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.lastIndex)
     }
+    // Speak the newest assistant reply out loud when the user has turned that on.
+    val lastReply = messages.lastOrNull()
+    LaunchedEffect(lastReply) {
+        if (voice.autoSpeak && lastReply != null && !lastReply.fromUser && !lastReply.isError) voice.speak(lastReply.text)
+    }
+
+    val askMic = rememberMicPermission(
+        onDenied = { scope.launch { snack.showSnackbar("Microphone permission is needed to listen.") } },
+        onGranted = {
+            voice.startListening(
+                onResult = { heard -> vm.send(heard, voiceMode = voice.autoSpeak, language = voice.replyLanguage) },
+                onError = { msg -> scope.launch { snack.showSnackbar(msg) } },
+            )
+        },
+    )
 
     var menuOpen by remember { mutableStateOf(false) }
     TaknaScreen(
         title = "Chat",
         onBack = onBack,
+        snackbarHostState = snack,
         actions = {
+            IconButton(onClick = { voice.autoSpeak = !voice.autoSpeak; if (!voice.autoSpeak) voice.stopSpeaking() }) {
+                Icon(
+                    if (voice.autoSpeak) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                    contentDescription = if (voice.autoSpeak) "Spoken replies on" else "Spoken replies off",
+                    tint = if (voice.autoSpeak) TaknaColors.Cyan else TaknaColors.TextMuted,
+                )
+            }
             if (vm.models.size > 1) {
-                androidx.compose.material3.TextButton(onClick = { menuOpen = true }) { Text(vm.selected?.name ?: "TAKNA AI") }
-                androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                TextButton(onClick = { menuOpen = true }) { Text(vm.selected?.name ?: "TAKNA AI") }
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     vm.models.forEach { m ->
-                        androidx.compose.material3.DropdownMenuItem(
-                            text = { Text(m.name) },
-                            onClick = { vm.selected = m; menuOpen = false },
-                        )
+                        DropdownMenuItem(text = { Text(m.name) }, onClick = { vm.selected = m; menuOpen = false })
                     }
                 }
             }
@@ -72,7 +111,7 @@ fun ChatScreen(initialMessage: String?, onBack: () -> Unit, vm: ChatViewModel = 
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 if (messages.isEmpty()) item {
-                    Text("Ask me anything. I reply in the language you write in.", color = TaknaColors.TextMuted, modifier = Modifier.padding(top = 16.dp))
+                    Text("Ask me anything, by typing or with the mic. I reply in the language you use.", color = TaknaColors.TextMuted, modifier = Modifier.padding(top = 16.dp))
                 }
                 items(messages) { m ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (m.fromUser) Arrangement.End else Arrangement.Start) {
@@ -86,6 +125,11 @@ fun ChatScreen(initialMessage: String?, onBack: () -> Unit, vm: ChatViewModel = 
                                 RoundedCornerShape(16.dp),
                             ).padding(12.dp),
                         ) { Text(m.text, color = TaknaColors.TextPrimary) }
+                    }
+                }
+                if (voice.partialText.isNotBlank()) item {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        Text(voice.partialText, color = TaknaColors.TextMuted)
                     }
                 }
                 if (vm.busy) item {
@@ -105,9 +149,15 @@ fun ChatScreen(initialMessage: String?, onBack: () -> Unit, vm: ChatViewModel = 
                     value = text, onValueChange = { text = it },
                     placeholder = { Text("Message") }, modifier = Modifier.weight(1f),
                 )
-                FilledIconButton(onClick = { vm.send(text); text = "" }, enabled = !vm.busy) {
-                    Icon(Icons.AutoMirrored.Filled.Send, "Send")
-                }
+                FilledIconButton(
+                    onClick = {
+                        if (voice.orbState == com.takna.ai.ui.components.OrbState.Listening) voice.stopListening() else askMic()
+                    },
+                ) { Icon(Icons.Filled.Mic, "Microphone") }
+                FilledIconButton(
+                    onClick = { vm.send(text, voiceMode = voice.autoSpeak, language = voice.replyLanguage); text = "" },
+                    enabled = !vm.busy,
+                ) { Icon(Icons.AutoMirrored.Filled.Send, "Send") }
             }
         }
     }

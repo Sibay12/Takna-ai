@@ -20,12 +20,15 @@ import com.takna.ai.ui.screens.OnboardingScreen
 import com.takna.ai.ui.screens.PendingScreen
 import com.takna.ai.ui.screens.RegisterScreen
 import com.takna.ai.ui.screens.SplashScreenUi
+import com.takna.ai.ui.screens.VoiceSettingsScreen
+import com.takna.ai.voice.VoiceController
 
 @Composable
 fun TaknaApp() {
     val nav = rememberNavController()
     val back: () -> Unit = { nav.popBackStack() }
     val auth: AuthViewModel = viewModel()
+    val voice: VoiceController = viewModel()
     val toHome: () -> Unit = { nav.navigate(Routes.Home) { popUpTo(0) { inclusive = true } } }
     val toVerify: () -> Unit = { nav.navigate(Routes.VerifyEmail) { popUpTo(0) { inclusive = true } } }
     val toLogin: () -> Unit = { nav.navigate(Routes.Login) { popUpTo(0) { inclusive = true } } }
@@ -75,18 +78,20 @@ fun TaknaApp() {
                     catch (e: Exception) { null }
                 },
                 onSignOut = { auth.signOut(); toLogin() },
+                voice = voice,
             )
         }
         composable(
             route = Routes.ChatPattern,
             arguments = listOf(navArgument("q") { type = NavType.StringType; nullable = true; defaultValue = null }),
         ) { entry ->
-            ChatScreen(initialMessage = entry.arguments?.getString("q"), onBack = back)
+            ChatScreen(initialMessage = entry.arguments?.getString("q"), onBack = back, voice = voice)
         }
         composable(Routes.More) {
             MoreScreen(onOpen = { nav.navigate(it) }, canSignOut = auth.signedIn, onSignOut = { auth.signOut(); toLogin() }, onBack = back)
         }
         composable(Routes.About) { AboutScreen(onBack = back) }
+        composable(Routes.VoiceSettings) { VoiceSettingsScreen(voice = voice, onBack = back) }
         pendingScreens.forEach { (route, info) ->
             composable(route) { PendingScreen(info, onBack = back) }
         }

@@ -38,27 +38,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.takna.ai.nav.Routes
 import com.takna.ai.ui.components.AiOrb
 import com.takna.ai.ui.components.AwaitingCard
-import com.takna.ai.ui.components.OrbState
 import com.takna.ai.ui.components.SignOutDialog
 import com.takna.ai.ui.components.TaknaScreen
 import com.takna.ai.ui.theme.TaknaColors
+import com.takna.ai.voice.VoiceController
+import com.takna.ai.voice.rememberMicPermission
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: Boolean, onSignOut: () -> Unit, loadUsage: suspend () -> String?) {
+fun HomeScreen(
+    onOpen: (String) -> Unit,
+    onChat: (String?) -> Unit,
+    canSignOut: Boolean,
+    onSignOut: () -> Unit,
+    loadUsage: suspend () -> String?,
+    voice: VoiceController = viewModel(),
+) {
     val usageText by androidx.compose.runtime.produceState<String?>(initialValue = null) { value = loadUsage() }
     var confirmSignOut by remember { mutableStateOf(false) }
     var text by remember { mutableStateOf("") }
     val snack = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    fun notYet(what: String) = scope.launch { snack.showSnackbar("$what arrives in Phase 6 (voice).") }
     fun send() {
         val q = text.trim()
         if (q.isNotEmpty()) { text = ""; onChat(q) }
     }
+    val askMic = rememberMicPermission(
+        onDenied = { scope.launch { snack.showSnackbar("Microphone permission is needed to listen.") } },
+        onGranted = {
+            voice.startListening(
+                onResult = { heard -> onChat(heard) },
+                onError = { msg -> scope.launch { snack.showSnackbar(msg) } },
+            )
+        },
+    )
 
     if (confirmSignOut) SignOutDialog(onConfirm = { confirmSignOut = false; onSignOut() }, onDismiss = { confirmSignOut = false })
     TaknaScreen(
@@ -74,9 +91,9 @@ fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: 
             Modifier.fillMaxSize().padding(pad).padding(horizontal = 20.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AiOrb(OrbState.Idle, Modifier.padding(top = 12.dp), orbSize = 200.dp)
+            AiOrb(voice.orbState, Modifier.padding(top = 12.dp), orbSize = 200.dp)
             Text(
-                "Hello, I'm TAKNA AI. How can I help you?",
+                if (voice.partialText.isNotBlank()) voice.partialText else "Hello, I'm TAKNA AI. How can I help you?",
                 color = TaknaColors.TextPrimary,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
             )
@@ -96,11 +113,25 @@ fun HomeScreen(onOpen: (String) -> Unit, onChat: (String?) -> Unit, canSignOut: 
                 FilledIconButton(onClick = { send() }) { Icon(Icons.AutoMirrored.Filled.Send, "Send") }
             }
             Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                FilledIconButton(onClick = { notYet("Voice input") }, modifier = Modifier.size(64.dp)) {
+                FilledIconButton(
+                    onClick = {
+                        if (voice.orbState == com.takna.ai.ui.components.OrbState.Listening) voice.stopListening() else askMic()
+                    },
+                    modifier = Modifier.size(64.dp),
+                ) {
                     Icon(Icons.Filled.Mic, "Microphone", Modifier.size(30.dp))
                 }
-                IconButton(onClick = { notYet("Speaking control") }, modifier = Modifier.size(64.dp)) {
-                    Icon(Icons.Filled.VolumeOff, "Stop speaking", tint = TaknaColors.Cyan, modifier = Modifier.size(28.dp))
+                IconButton(
+                    onClick = { voice.stopSpeaking() },
+                    enabled = voice.isSpeaking,
+                    modifier = Modifier.size(64.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.VolumeOff,
+                        "Stop speaking",
+                        tint = if (voice.isSpeaking) TaknaColors.Cyan else TaknaColors.TextMuted,
+                        modifier = Modifier.size(28.dp),
+                    )
                 }
             }
 

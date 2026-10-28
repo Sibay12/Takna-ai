@@ -39,13 +39,13 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun sendInitial(text: String?) {
+    fun sendInitial(text: String?, voiceMode: Boolean = false, language: String = "auto") {
         if (initialSent || text.isNullOrBlank()) return
         initialSent = true
-        send(text)
+        send(text, voiceMode, language)
     }
 
-    fun send(raw: String) {
+    fun send(raw: String, voiceMode: Boolean = false, language: String = "auto") {
         val text = raw.trim()
         if (text.isEmpty() || busy) return
         messages.add(ChatMessage(true, text))
@@ -57,7 +57,7 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
             busy = true
             try {
                 val token = auth.idToken() ?: throw ApiException(401, "no_token", "")
-                val reply = ApiClient.chat(token, text, conversationId, selected?.id)
+                val reply = ApiClient.chat(token, text, conversationId, selected?.id, language = language, voiceMode = voiceMode)
                 if (reply.conversationId.isNotEmpty()) conversationId = reply.conversationId
                 messages.add(ChatMessage(false, reply.text))
                 usageLine = "${reply.used} / ${reply.limit} requests used today"

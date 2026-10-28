@@ -52,8 +52,15 @@ object ApiClient {
             }
         }
 
-    suspend fun chat(token: String, message: String, conversationId: String?, modelId: String? = null): ChatReply {
-        val body = JSONObject().put("message", message).put("language", "auto").put("mode", "text")
+    suspend fun chat(
+        token: String,
+        message: String,
+        conversationId: String?,
+        modelId: String? = null,
+        language: String = "auto",
+        voiceMode: Boolean = false,
+    ): ChatReply {
+        val body = JSONObject().put("message", message).put("language", language).put("mode", if (voiceMode) "voice" else "text")
         if (conversationId != null) body.put("conversationId", conversationId)
         if (modelId != null) body.put("modelId", modelId)
         val r = call("POST", "/ai/chat", token, body)

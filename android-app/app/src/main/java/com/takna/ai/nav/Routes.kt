@@ -35,7 +35,6 @@ object Routes {
 data class Pending(val title: String, val phase: String, val note: String)
 
 val pendingScreens: Map<String, Pending> = mapOf(
-    Routes.VoiceSettings to Pending("Voice settings", "Phase 6", "Voices, language, speaking rate and pitch will be read from what this phone actually supports."),
     Routes.AppLauncher to Pending("App launcher", "Phase 6", "Allow-listed app opening (YouTube, Chrome, Calculator) through standard Android intents."),
     Routes.YouTube to Pending("YouTube assistant", "Phase 6", "Search and open YouTube through supported intents."),
     Routes.CodingStudio to Pending("Coding Studio", "Phase 7", "Backend project and file APIs exist. The workspace UI comes next."),

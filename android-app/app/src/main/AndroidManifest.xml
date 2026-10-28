@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- RECORD_AUDIO is intentionally NOT declared yet. It is added in the voice phase (Phase 6),
-         and the mic will only ever record after the user taps it. -->
+    <!-- Declared for the voice phase. The system still asks the user at runtime, and the app only
+         calls startListening() after that permission is granted and the user has tapped the mic. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:allowBackup="false"
