@@ -1,5 +1,5 @@
 TAKNA AI - PROGRESS REPORT
-Updated: 2026-10-25  |  backend v0.2.2 LIVE on Render, android-app v0.2.0 (debug APK via GitHub Actions)
+Updated: 2026-10-28  |  backend LIVE on Render, android-app v0.2.0 + voice (debug APK via GitHub Actions)
 (This file is updated and shipped with every delivery.)
 
 OVERALL (approx., by the 14 phases in the master prompt): about 2.5 of 14 phases.
@@ -12,7 +12,7 @@ PHASE STATUS
  3  Google + email auth (Android) ....... DONE (owner confirmed sign-in works; backend token check live)
  4  Backend + MongoDB + ai_ collections . DONE (written, NOT yet executed)
  5  Gemini integration .................. backend LIVE; app Chat wired to /ai/chat (v0.2.0, awaiting owner test); streaming + history screen to do
- 6  Voice / app control / YouTube ....... NOT STARTED
+ 6  Voice / app control / YouTube ... Voice (listen+speak, Voice settings) DONE; app launching + YouTube NOT STARTED
  7  Coding workspace ................... NOT STARTED (backend project/file APIs DONE)
  8  Admin Panel (Next.js) ............... NOT STARTED (backend: users list, suspend, retention DONE)
  9  7-day retention + TTL ............... DONE in backend (written, NOT yet executed)
