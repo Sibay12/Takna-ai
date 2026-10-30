@@ -1,0 +1,27 @@
+name: Admin panel CI
+
+on:
+  push:
+    paths: ['admin-panel/**', '.github/workflows/admin-panel-ci.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin-panel
+    env:
+      NEXT_PUBLIC_API_BASE: https://takna-ai.onrender.com/api/v1
+      NEXT_PUBLIC_FIREBASE_API_KEY: placeholder
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: placeholder.firebaseapp.com
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: placeholder
+      NEXT_PUBLIC_FIREBASE_APP_ID: 1:0:web:0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm run build
