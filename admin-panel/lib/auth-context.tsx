@@ -1,7 +1,13 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut as fbSignOut, type User } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut as fbSignOut,
+  type User,
+} from "firebase/auth";
 import { auth, firebaseConfigured } from "./firebase";
 import { api, type MeUser } from "./api";
 
@@ -14,6 +20,7 @@ interface AuthState {
   isAdmin: boolean | null;
   error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   idToken: () => Promise<string | null>;
 }
@@ -64,12 +71,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    if (!auth) throw new Error("Firebase is not configured on this deployment.");
+    // Always resolves without revealing whether the email has an account, matching Firebase's own behaviour.
+    await sendPasswordResetEmail(auth, email.trim());
+  };
+
   const signOutFn = async () => { if (auth) await fbSignOut(auth); };
 
   const idToken = async () => (firebaseUser ? firebaseUser.getIdToken() : null);
 
   return (
-    <Ctx.Provider value={{ configured: firebaseConfigured, loading, firebaseUser, me, isAdmin, error, signIn, signOut: signOutFn, idToken }}>
+    <Ctx.Provider
+      value={{ configured: firebaseConfigured, loading, firebaseUser, me, isAdmin, error, signIn, resetPassword, signOut: signOutFn, idToken }}
+    >
       {children}
     </Ctx.Provider>
   );
