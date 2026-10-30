@@ -1,5 +1,5 @@
 TAKNA AI - PROGRESS REPORT
-Updated: 2026-10-28  |  backend LIVE on Render, android-app v0.2.0 + voice (debug APK via GitHub Actions)
+Updated: 2026-10-30  |  backend + admin panel LIVE on Render, android-app v0.2.0 + voice
 (This file is updated and shipped with every delivery.)
 
 OVERALL (approx., by the 14 phases in the master prompt): about 2.5 of 14 phases.
@@ -14,7 +14,7 @@ PHASE STATUS
  5  Gemini integration .................. backend LIVE; app Chat wired to /ai/chat (v0.2.0, awaiting owner test); streaming + history screen to do
  6  Voice / app control / YouTube ... Voice (listen+speak, Voice settings) DONE; app launching + YouTube NOT STARTED
  7  Coding workspace ................... NOT STARTED (backend project/file APIs DONE)
- 8  Admin Panel (Next.js) ............... NOT STARTED (backend: users list, suspend, retention DONE)
+ 8  Admin Panel (Next.js) ............... LIVE at https://takna-ai-admin.onrender.com: users, AI providers, retention. Needs Firebase web config (NEXT_PUBLIC_FIREBASE_*) to sign in.
  9  7-day retention + TTL ............... DONE in backend (written, NOT yet executed)
 10  Subscriptions / entitlements ........ NOT STARTED (plans list endpoint only)
 11  TaknaPay ............................ BLOCKED until official API docs + credentials
