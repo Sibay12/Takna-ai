@@ -38,7 +38,10 @@ const HISTORY_TURNS = 20;
 
 export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimits; gateway?: ProviderGateway }): Router {
   const { db, ai, limits, gateway } = deps;
-  const pick = async (modelId?: string): Promise<AiProvider> => (gateway ? gateway.resolve(modelId) : ai);
+  /** Sends the message, automatically trying every other enabled AI connection if one fails
+   *  (overloaded, down, misconfigured, …) so a reply still goes through. */
+  const send = async (turns: ChatTurn[], opts: Parameters<AiProvider["sendMessage"]>[1], modelId?: string) =>
+    gateway ? gateway.sendMessage(turns, opts ?? {}, modelId) : { text: await ai.sendMessage(turns, opts), provider: ai };
   const r = Router();
   const perUser = rateLimit({
     windowMs: 60_000,
@@ -87,10 +90,9 @@ export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimit
         )
       : [];
     const turns: ChatTurn[] = [...history, { role: "user", content: b.message }];
-    const provider = await pick(b.modelId);
 
-    const { result: raw, used } = await guarded(owner, () =>
-      provider.sendMessage(turns, { system: chatSystem(b.language, b.mode), maxOutputTokens: b.mode === "voice" ? Math.min(limits.maxOutputTokens, 400) : limits.maxOutputTokens }),
+    const { result: { text: raw, provider }, used } = await guarded(owner, () =>
+      send(turns, { system: chatSystem(b.language, b.mode), maxOutputTokens: b.mode === "voice" ? Math.min(limits.maxOutputTokens, 400) : limits.maxOutputTokens }, b.modelId),
     );
 
     const reply = sanitizeReply(raw, [provider.model]);
@@ -113,12 +115,11 @@ export function aiRouter(deps: { db: DbProvider; ai: AiProvider; limits: AiLimit
       return { path: validateRelativePath(f.path), content: f.content };
     });
     if (total > 200_000) throw badRequest("Attached files are too large", "payload_too_large");
-    const provider = await pick(b.modelId);
-    const { result: rawText, used } = await guarded(req.auth!.uid, () =>
-      provider.sendMessage([{ role: "user", content: codeUserPrompt(b.prompt, files) }], {
+    const { result: { text: rawText, provider }, used } = await guarded(req.auth!.uid, () =>
+      send([{ role: "user", content: codeUserPrompt(b.prompt, files) }], {
         system: codeSystem(b.task, b.language),
         maxOutputTokens: limits.maxOutputTokens,
-      }),
+      }, b.modelId),
     );
     const text = sanitizeReply(rawText, [provider.model]);
     res.json({ task: b.task, text, usage: { used, limit: limits.dailyRequests } });
