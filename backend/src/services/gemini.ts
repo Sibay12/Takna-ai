@@ -38,7 +38,7 @@ export class GeminiProvider implements AiProvider {
     this.configured = !!apiKey;
   }
 
-  private async request(path: string, init: RequestInit): Promise<any> {
+  private async requestOnce(path: string, init: RequestInit): Promise<any> {
     if (!this.apiKey) throw new AppError(503, "ai_not_configured", "AI is not configured on the server.");
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), this.timeoutMs);
@@ -56,6 +56,18 @@ export class GeminiProvider implements AiProvider {
       throw new AppError(502, "ai_network_error", "Could not reach the AI service.");
     } finally {
       clearTimeout(timer);
+    }
+  }
+
+  /** Outbound calls to Google's API occasionally hang or drop on a flaky network path; one quiet retry
+   *  on a timeout/network error smooths that over without the caller ever seeing it. */
+  private async request(path: string, init: RequestInit): Promise<any> {
+    try {
+      return await this.requestOnce(path, init);
+    } catch (e) {
+      const retryable = e instanceof AppError && (e.code === "ai_timeout" || e.code === "ai_network_error");
+      if (!retryable) throw e;
+      return await this.requestOnce(path, init);
     }
   }
 
