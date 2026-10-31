@@ -48,7 +48,14 @@ export class GeminiProvider implements AiProvider {
         signal: ctrl.signal,
         headers: { "content-type": "application/json", "x-goog-api-key": this.apiKey },
       });
-      if (!res.ok) throw mapStatus(res.status);
+      if (!res.ok) {
+        // Temporary diagnostic: log Google's actual status + body (never the key) to find out
+        // why a non-timeout failure is happening. Safe to remove once the cause is confirmed.
+        const bodyText = await res.text().catch(() => "");
+        // eslint-disable-next-line no-console
+        console.error("[gemini] upstream error", { status: res.status, body: bodyText.slice(0, 500) });
+        throw mapStatus(res.status);
+      }
       return await res.json();
     } catch (e) {
       if (e instanceof AppError) throw e;
