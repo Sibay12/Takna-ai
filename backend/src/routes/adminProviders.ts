@@ -110,7 +110,9 @@ export function adminProvidersRouter(deps: { db: DbProvider; secret: string | un
     const p = buildProvider(cur, decryptSecret(cur.apiKeyEnc, s));
     let connection: { ok: boolean; error?: string } = { ok: true };
     try {
-      await p.sendMessage([{ role: "user", content: "Reply with: OK" }], { maxOutputTokens: 16 });
+      // Newer "thinking" models (e.g. Gemini 2.5 Flash) spend part of maxOutputTokens on internal
+      // reasoning before any visible text, so a very small budget can finish with no text at all.
+      await p.sendMessage([{ role: "user", content: "Reply with: OK" }], { maxOutputTokens: 128 });
     } catch (e) {
       connection = { ok: false, error: (e as { code?: string }).code ?? "error" };
     }
