@@ -33,7 +33,7 @@ export class GeminiProvider implements AiProvider {
     private readonly apiKey: string | undefined,
     readonly model: string,
     private readonly fetchFn: typeof fetch = fetch,
-    private readonly timeoutMs = 30_000,
+    private readonly timeoutMs = 45_000,
   ) {
     this.configured = !!apiKey;
   }
