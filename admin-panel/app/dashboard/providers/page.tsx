@@ -30,7 +30,7 @@ export default function ProvidersPage() {
   const [editing, setEditing] = useState<string | null>(null); // provider id, or "new"
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [testResult, setTestResult] = useState<Record<string, string>>({});
+  const [testResult, setTestResult] = useState<Record<string, { status: string; models?: string[] }>>({});
 
   const load = async () => {
     const token = await idToken();
@@ -89,12 +89,18 @@ export default function ProvidersPage() {
   const test = async (p: AiProvider) => {
     const token = await idToken();
     if (!token) return;
-    setTestResult((s) => ({ ...s, [p.id]: "Testing…" }));
+    setTestResult((s) => ({ ...s, [p.id]: { status: "Testing…" } }));
     try {
       const r = await api.testProvider(token, p.id);
-      setTestResult((s) => ({ ...s, [p.id]: r.connection.ok ? "Connected" : `Failed: ${r.connection.error ?? "error"}` }));
+      setTestResult((s) => ({
+        ...s,
+        [p.id]: {
+          status: r.connection.ok ? "Connected" : `Failed: ${r.connection.error ?? "error"}`,
+          models: r.availableModels ?? undefined,
+        },
+      }));
     } catch (e) {
-      setTestResult((s) => ({ ...s, [p.id]: e instanceof ApiError ? e.message : "Test failed." }));
+      setTestResult((s) => ({ ...s, [p.id]: { status: e instanceof ApiError ? e.message : "Test failed." } }));
     }
   };
 
@@ -202,7 +208,28 @@ export default function ProvidersPage() {
                       <button className="btn secondary" onClick={() => test(p)}>Test</button>
                       <button className="btn danger" onClick={() => remove(p)}>Delete</button>
                     </div>
-                    {testResult[p.id] && <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>{testResult[p.id]}</div>}
+                    {testResult[p.id] && (
+                      <div className="muted" style={{ fontSize: 12, marginTop: 4, maxWidth: 360 }}>
+                        <div>{testResult[p.id].status}</div>
+                        {testResult[p.id].models && testResult[p.id].models!.length > 0 && (
+                          <details style={{ marginTop: 4 }}>
+                            <summary style={{ cursor: "pointer" }}>
+                              {testResult[p.id].models!.length} models available on this key
+                            </summary>
+                            <div style={{ marginTop: 4, display: "flex", flexWrap: "wrap", gap: 4 }}>
+                              {testResult[p.id].models!.map((m) => (
+                                <code
+                                  key={m}
+                                  style={{ fontSize: 11, padding: "2px 6px", borderRadius: 4, background: "rgba(127,127,127,0.15)" }}
+                                >
+                                  {m}
+                                </code>
+                              ))}
+                            </div>
+                          </details>
+                        )}
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
